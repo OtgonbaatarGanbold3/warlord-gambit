@@ -1,0 +1,23 @@
+{
+  "godot_tools.editor_path": "/Users/otgonbaatarganbold/Library/Application Support/Steam/steamapps/common/Godot Engine/Godot.app/Contents/MacOS/Godot",
+  "files.associations": {
+    "*.gd": "gdscript",
+    "*.tscn": "gdscript",
+    "*.tres": "gdscript"
+  },
+  "[gdscript]": {
+    "editor.defaultFormatter": "geequlim.godot-tools",
+    "editor.tabSize": 4,
+    "editor.insertSpaces": false
+  },
+  "github.copilot.enable": {
+    "*": true,
+    "gdscript": true
+  },
+  "editor.inlineSuggest.enabled": true,
+  "editor.quickSuggestions": {
+    "other": true,
+    "comments": true,
+    "strings": true
+  }
+}
