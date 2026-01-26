@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://b120uvgioi3gw"]
+
+[ext_resource type="Script" uid="uid://bf61c3lq172sq" path="res://scripts/core/item_data.gd" id="1_iod7t"]
+
+[resource]
+script = ExtResource("1_iod7t")
+item_name = "Iron Sword"
+atk_bonus = 5
+description = "A basic iron sword. +5 ATK"
+metadata/_custom_type_script = "uid://bf61c3lq172sq"

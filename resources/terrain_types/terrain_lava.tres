@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="TerrainData" format=3 uid="uid://bmwbxilwl2bsx"]
+
+[ext_resource type="Script" uid="uid://bgs5o5rpjn31y" path="res://scripts/core/terrain_data.gd" id="1_3ywnd"]
+
+[resource]
+script = ExtResource("1_3ywnd")
+terrain_name = "Lava"
+terrain_type = "LAVA"
+description = "Dangerous lava. Deals 5 damage per turn!"
+damage_per_turn = 5
+color = Color(0.70521504, 0.191533, 0, 1)

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bkjpg1ern380w"]
+
+[ext_resource type="Script" uid="uid://bf61c3lq172sq" path="res://scripts/core/item_data.gd" id="1_qvm8f"]
+
+[resource]
+script = ExtResource("1_qvm8f")
+item_name = "Boots of Speed"
+slot_type = "ACCESSORY"
+speed_bonus = 3
+description = "Light boots. +3 SPD"
+metadata/_custom_type_script = "uid://bf61c3lq172sq"

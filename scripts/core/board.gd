@@ -32,6 +32,11 @@ const TILE_SIZE: int = 64
 ## null = empty tile, otherwise stores reference to unit or terrain data
 var grid_data: Array = []
 
+## 2D array storing TerrainData for each tile
+## Access with terrain_data[row][col] or terrain_data[y][x]
+## null = no terrain assigned, otherwise stores TerrainData resource
+var terrain_data: Array = []
+
 ## Currently selected grid position (-1,-1 means nothing selected)
 var selected_position: Vector2i = Vector2i(-1, -1)
 
@@ -86,16 +91,25 @@ func create_visual_board() -> void:
 			tile_rects.append(tile)
 
 
-## Initializes the grid_data 2D array with null values
-## Each cell starts empty (null) and can later hold unit references
+## Initializes the grid_data and terrain_data 2D arrays with null values
+## Each cell starts empty (null) and can later hold unit/terrain references
 func initialize_grid_data() -> void:
 	grid_data.clear() # Clear any existing data
+	terrain_data.clear() # Clear any existing terrain
 	
+	# Initialize grid_data (stores units)
 	for row in range(BOARD_SIZE):
 		var row_data: Array = []
 		for col in range(BOARD_SIZE):
 			row_data.append(null) # Empty tile
 		grid_data.append(row_data)
+	
+	# Initialize terrain_data (stores TerrainData resources)
+	for row in range(BOARD_SIZE):
+		var terrain_row: Array = []
+		for col in range(BOARD_SIZE):
+			terrain_row.append(null) # No terrain assigned yet
+		terrain_data.append(terrain_row)
 
 # ============================================================================
 # COORDINATE CONVERSION
@@ -199,6 +213,177 @@ func clear_highlights() -> void:
 	for child in children:
 		if child is ColorRect and not child in tile_rects:
 			child.queue_free()
+
+# ============================================================================
+# TERRAIN MANAGEMENT
+# ============================================================================
+
+## Sets the terrain at a grid position and updates the tile's visual color
+## @param grid_pos: Grid coordinates to set terrain at
+## @param terrain: TerrainData resource to assign (or null to clear)
+func set_terrain(grid_pos: Vector2i, terrain: TerrainData) -> void:
+	if not is_valid_position(grid_pos):
+		return
+	
+	# Store terrain data in the 2D array
+	terrain_data[grid_pos.y][grid_pos.x] = terrain
+	
+	# Update the tile's visual appearance
+	if terrain:
+		update_tile_visual_color(grid_pos, terrain.color)
+	else:
+		# Reset to default checkerboard color if terrain is cleared
+		var default_color: Color
+		if (grid_pos.y + grid_pos.x) % 2 == 0:
+			default_color = Color(0.9, 0.9, 0.8) # Light cream
+		else:
+			default_color = Color(0.7, 0.7, 0.6) # Dark tan
+		update_tile_visual_color(grid_pos, default_color)
+
+
+## Gets the terrain at a grid position
+## @param grid_pos: Grid coordinates to check
+## @return: TerrainData at that position, or null if none
+func get_terrain(grid_pos: Vector2i) -> TerrainData:
+	if not is_valid_position(grid_pos):
+		return null
+	return terrain_data[grid_pos.y][grid_pos.x]
+
+
+## Updates the visual color of a tile to reflect its terrain
+## Maintains checkerboard pattern by blending terrain color with base tile color
+## @param grid_pos: Grid coordinates of the tile to update
+## @param terrain_color: The terrain's color to apply
+func update_tile_visual_color(grid_pos: Vector2i, terrain_color: Color) -> void:
+	# Calculate tile index in the flat tile_rects array
+	# Tiles are stored row by row: index = row * BOARD_SIZE + col
+	var tile_index: int = grid_pos.y * BOARD_SIZE + grid_pos.x
+	
+	if tile_index >= 0 and tile_index < tile_rects.size():
+		# Blend terrain color with checkerboard pattern for visual variety
+		var base_brightness: float = 1.0 if (grid_pos.y + grid_pos.x) % 2 == 0 else 0.85
+		var blended_color = Color(
+			terrain_color.r * base_brightness,
+			terrain_color.g * base_brightness,
+			terrain_color.b * base_brightness,
+			terrain_color.a
+		)
+		tile_rects[tile_index].color = blended_color
+
+
+## Generates random terrain across the board for tactical variety
+## Creates clusters of terrain for more realistic/interesting maps
+## Avoids placing special terrain on spawn rows (0-2 for enemies, 7-9 for players)
+func generate_random_terrain() -> void:
+	print("[Board] Generating random terrain...")
+	
+	# Load terrain resources
+	var plains: TerrainData = load("res://resources/terrain_types/terrain_plains.tres")
+	var forest: TerrainData = load("res://resources/terrain_types/terrain_forest.tres")
+	var mountain: TerrainData = load("res://resources/terrain_types/terrain_mountain.tres")
+	var water: TerrainData = load("res://resources/terrain_types/terrain_water.tres")
+	
+	# Validate resources loaded
+	if not plains:
+		push_warning("[Board] Could not load terrain_plains.tres - using null terrain")
+	if not forest:
+		push_warning("[Board] Could not load terrain_forest.tres")
+	if not mountain:
+		push_warning("[Board] Could not load terrain_mountain.tres")
+	if not water:
+		push_warning("[Board] Could not load terrain_water.tres")
+	
+	# Set all tiles to plains by default
+	for row in range(BOARD_SIZE):
+		for col in range(BOARD_SIZE):
+			var pos = Vector2i(col, row)
+			set_terrain(pos, plains)
+	
+	# Define safe zones where we won't place special terrain
+	# Rows 0-2: Enemy spawn area
+	# Rows 7-9: Player spawn area
+	# Only place special terrain in rows 3-6 (the "battlefield")
+	var min_safe_row: int = 3
+	var max_safe_row: int = 6
+	
+	# --- GENERATE FOREST CLUSTERS (15% of battlefield tiles) ---
+	# Forests provide cover and slow movement
+	var forest_seeds: int = 3 # Number of forest clusters
+	for i in range(forest_seeds):
+		_generate_terrain_cluster(forest, min_safe_row, max_safe_row, 3, 5)
+	
+	# --- GENERATE MOUNTAIN CLUSTERS (10% of battlefield tiles) ---
+	# Mountains provide height advantage but are slow to traverse
+	var mountain_seeds: int = 2 # Number of mountain clusters
+	for i in range(mountain_seeds):
+		_generate_terrain_cluster(mountain, min_safe_row, max_safe_row, 2, 3)
+	
+	# --- GENERATE WATER TILES (8% of battlefield, more isolated) ---
+	# Water blocks movement, creating tactical chokepoints
+	var water_seeds: int = 2
+	for i in range(water_seeds):
+		_generate_terrain_cluster(water, min_safe_row, max_safe_row, 1, 3)
+	
+	print("[Board] Terrain generation complete!")
+
+
+## Helper function to generate a cluster of terrain tiles
+## Creates organic-looking terrain patches by growing from a seed point
+## @param terrain: TerrainData resource to place
+## @param min_row: Minimum row to place terrain (inclusive)
+## @param max_row: Maximum row to place terrain (inclusive)
+## @param min_size: Minimum number of tiles in cluster
+## @param max_size: Maximum number of tiles in cluster
+func _generate_terrain_cluster(terrain: TerrainData, min_row: int, max_row: int, min_size: int, max_size: int) -> void:
+	if not terrain:
+		return
+	
+	# Pick a random seed position within the safe zone
+	var seed_col: int = randi_range(1, BOARD_SIZE - 2) # Avoid edges
+	var seed_row: int = randi_range(min_row, max_row)
+	var seed_pos = Vector2i(seed_col, seed_row)
+	
+	# Determine cluster size
+	var cluster_size: int = randi_range(min_size, max_size)
+	
+	# Track positions to fill
+	var positions_to_fill: Array[Vector2i] = [seed_pos]
+	var filled_count: int = 0
+	
+	# Grow the cluster organically
+	while filled_count < cluster_size and positions_to_fill.size() > 0:
+		# Pick a random position from our list
+		var index: int = randi_range(0, positions_to_fill.size() - 1)
+		var pos: Vector2i = positions_to_fill[index]
+		positions_to_fill.remove_at(index)
+		
+		# Check if position is valid and within safe zone
+		if not is_valid_position(pos):
+			continue
+		if pos.y < min_row or pos.y > max_row:
+			continue
+		
+		# Don't overwrite existing special terrain (only plains)
+		var existing: TerrainData = get_terrain(pos)
+		if existing and existing.terrain_type != "PLAINS":
+			continue
+		
+		# Place the terrain
+		set_terrain(pos, terrain)
+		filled_count += 1
+		
+		# Add adjacent tiles as candidates for expansion (4-directional)
+		var neighbors: Array[Vector2i] = [
+			Vector2i(pos.x - 1, pos.y), # Left
+			Vector2i(pos.x + 1, pos.y), # Right
+			Vector2i(pos.x, pos.y - 1), # Up
+			Vector2i(pos.x, pos.y + 1), # Down
+		]
+		
+		# Randomly add neighbors (70% chance each for organic growth)
+		for neighbor in neighbors:
+			if randf() < 0.7 and neighbor not in positions_to_fill:
+				positions_to_fill.append(neighbor)
 
 # ============================================================================
 # INPUT HANDLING

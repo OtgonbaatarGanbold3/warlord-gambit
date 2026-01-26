@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://crau765w1nfg1"]
+
+[ext_resource type="Script" uid="uid://bf61c3lq172sq" path="res://scripts/core/item_data.gd" id="1_wr420"]
+
+[resource]
+script = ExtResource("1_wr420")
+item_name = "Dragon Scale Armor"
+rarity = "LEGENDARY"
+slot_type = "ARMOR"
+hp_bonus = 30
+def_bonus = 15
+special_effect = "Immune to fire damage"
+description = "Legendary armor. +30 HP, +15 DEF"
+metadata/_custom_type_script = "uid://bf61c3lq172sq"

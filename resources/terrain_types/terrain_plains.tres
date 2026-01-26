@@ -1,0 +1,9 @@
+[gd_resource type="Resource" script_class="TerrainData" format=3 uid="uid://d1rc56j4pgrgs"]
+
+[ext_resource type="Script" uid="uid://bgs5o5rpjn31y" path="res://scripts/core/terrain_data.gd" id="1_t87hf"]
+
+[resource]
+script = ExtResource("1_t87hf")
+terrain_name = "Plains"
+description = "Open terrain with no bonuses."
+color = Color(0.8392157, 0.70980394, 0.53333336, 1)

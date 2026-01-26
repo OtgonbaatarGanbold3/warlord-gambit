@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://cbepjmcsf830"]
+
+[ext_resource type="Script" uid="uid://bf61c3lq172sq" path="res://scripts/core/item_data.gd" id="1_04cdk"]
+
+[resource]
+script = ExtResource("1_04cdk")
+item_name = "Health Amulet"
+rarity = "UNCOMMON"
+slot_type = "ACCESSORY"
+hp_bonus = 20
+special_effect = "Regenerate 2 HP per turn"
+description = "Mystical amulet. +20 HP"
+metadata/_custom_type_script = "uid://bf61c3lq172sq"

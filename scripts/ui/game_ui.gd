@@ -91,13 +91,21 @@ func update_unit_display(unit) -> void:
 		unit_name_label.text = "Unknown Unit"
 		unit_type_label.text = unit.unit_type
 	
-	# Update stats label with current values
-	unit_stats_label.text = "HP: %d/%d\nATK: %d\nDEF: %d\nSPD: %d" % [
+	# Build equipped items text if unit has any
+	var equipped_text: String = ""
+	if "equipped_items" in unit and unit.equipped_items.size() > 0:
+		equipped_text = "\n\nEquipped:\n"
+		for item in unit.equipped_items:
+			equipped_text += "• " + item.item_name + "\n"
+	
+	# Update stats label with current values and equipped items
+	unit_stats_label.text = "HP: %d/%d\nATK: %d\nDEF: %d\nSPD: %d%s" % [
 		unit.current_hp,
 		unit.max_hp,
 		unit.current_atk,
 		unit.current_def,
-		unit.current_speed
+		unit.current_speed,
+		equipped_text
 	]
 	
 	# Build status text based on unit's action state

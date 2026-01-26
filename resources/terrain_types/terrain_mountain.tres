@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="TerrainData" format=3 uid="uid://biqlpduastygf"]
+
+[ext_resource type="Script" uid="uid://bgs5o5rpjn31y" path="res://scripts/core/terrain_data.gd" id="1_8vcip"]
+
+[resource]
+script = ExtResource("1_8vcip")
+terrain_name = "Mountain"
+terrain_type = "MOUNTAIN"
+description = "High ground. Costs 2 movement, +3 DEF, +1 range for archers."
+movement_cost = 2
+defense_bonus = 3
+range_bonus = 1
+color = Color(0.43134022, 0.43134025, 0.43134025, 1)

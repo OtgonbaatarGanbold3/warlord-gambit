@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://bx5xdv6la47b8"]
+
+[ext_resource type="Script" uid="uid://bf61c3lq172sq" path="res://scripts/core/item_data.gd" id="1_ckuyb"]
+
+[resource]
+script = ExtResource("1_ckuyb")
+item_name = "Flame Sword"
+rarity = "RARE"
+atk_bonus = 12
+special_effect = "10% chance to burn enemy"
+description = "Blazing sword. +12 ATK"
+metadata/_custom_type_script = "uid://bf61c3lq172sq"

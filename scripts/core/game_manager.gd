@@ -84,6 +84,7 @@ func _ready() -> void:
 	
 	# Setup in order: board -> units -> signals -> start turn
 	setup_board()
+	board.generate_random_terrain()
 	spawn_test_units()
 	connect_signals()
 	
@@ -621,7 +622,20 @@ func check_game_over():
 	elif enemy_units.size() == 0:
 		print("VICTORY - You Won!")
 		current_state = GameState.GAME_OVER
-		show_game_over_popup("VICTORY", "You defeated all enemies!")
+		
+		# Generate item drops as rewards!
+		var items_dropped: Array = []
+		for i in range(3): # Drop 3 random items
+			var item = ItemManager.generate_random_item_drop()
+			if item:
+				items_dropped.append(item)
+		
+		# Build victory message with item list
+		var message: String = "You defeated all enemies!\n\nItems dropped:\n"
+		for item in items_dropped:
+			message += "• " + item.item_name + " (" + item.rarity + ")\n"
+		
+		show_game_over_popup("VICTORY", message)
 
 func show_game_over_popup(title: String, message: String):
 	# Create a simple popup
@@ -654,35 +668,37 @@ func _on_game_over_confirmed():
 ## Resets units for the active faction and sets appropriate state
 ## @param faction: The faction whose turn is starting ("PLAYER" or "ENEMY")
 ## @param turn_number: The current turn count
+
 func _on_turn_started(faction: String, turn_number: int) -> void:
-	print("\n[GameManager] =============================")
-	print("[GameManager] === Turn ", turn_number, ": ", faction, " ===")
-	print("[GameManager] =============================\n")
+	print("\n=== Turn ", turn_number, ": ", faction, " ===")
 	
 	# Update UI
 	if ui:
 		ui.update_turn_display(turn_number, faction)
 	
-	# Deselect any selected unit first
+	# Deselect any selected unit
 	deselect_unit()
 	
-	# Reset all units of active faction
-	var units_to_reset: Array = player_units if faction == "PLAYER" else enemy_units
+	# Get units to process
+	var units_to_reset = player_units if faction == "PLAYER" else enemy_units
+	
+	# Apply terrain damage to units
 	for unit in units_to_reset:
 		if unit and unit.current_hp > 0:
+			var terrain = board.get_terrain(unit.grid_position)
+			if terrain and terrain.damage_per_turn > 0:
+				print("Unit at ", unit.grid_position, " takes ", terrain.damage_per_turn, " terrain damage (", terrain.terrain_name, ")")
+				unit.take_damage(terrain.damage_per_turn)
+			
+			# Reset turn state
 			unit.reset_turn_state()
 	
 	if faction == "PLAYER":
-		# Player's turn - enable selection
 		current_state = GameState.SELECTING
-		print("[GameManager] Player's turn - select a unit to move/attack")
+		print("Player's turn - select a unit to move/attack")
 	else:
-		# Enemy's turn - disable player input and run AI
 		current_state = GameState.ENEMY_TURN
-		print("[GameManager] Enemy turn - executing AI...")
-		# Use call_deferred to allow signals to complete before AI runs
 		call_deferred("execute_enemy_turn")
-
 
 ## Called when a turn ends
 ## Cleans up selection state
@@ -829,3 +845,18 @@ func _input(event: InputEvent) -> void:
 		if selected_unit != null:
 			print("[GameManager] Selection cancelled")
 			deselect_unit()
+	
+	# DEBUG: Press "I" to equip random item to selected unit
+	if event is InputEventKey and event.pressed and event.keycode == KEY_I:
+		if selected_unit and selected_unit.is_player_unit:
+			var random_item = ItemManager.generate_random_item_drop()
+			if random_item:
+				ItemManager.equip_item(selected_unit, random_item)
+				print("[DEBUG] Equipped %s to selected unit" % random_item.item_name)
+				# Update UI to show new item
+				if ui:
+					ui.update_unit_display(selected_unit)
+			else:
+				print("[DEBUG] No items available to equip")
+		else:
+			print("[DEBUG] Select a player unit first to equip items")

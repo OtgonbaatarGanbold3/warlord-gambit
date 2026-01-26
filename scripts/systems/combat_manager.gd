@@ -74,29 +74,45 @@ func calculate_damage(attacker_atk: int, defender_def: int) -> Dictionary:
 ## @param defender: The unit receiving the attack
 ## @return: Dictionary with full combat results
 func resolve_combat(attacker, defender) -> Dictionary:
-	print("[CombatManager] === COMBAT START ===")
-	print("[CombatManager] ", attacker.unit_data.unit_name if attacker.unit_data else "Attacker",
-		  " attacks ", defender.unit_data.unit_name if defender.unit_data else "Defender")
-	
-	# Emit signal for combat start (UI can show attack animation)
+	# Emit combat started
 	combat_started.emit(attacker, defender)
 	
-	# Calculate damage using ATK vs DEF formula
-	var damage_result: Dictionary = calculate_damage(attacker.current_atk, defender.current_def)
+	# Get terrain bonuses
+	var attacker_terrain_bonus = 0
+	var defender_terrain_bonus = 0
 	
-	# Apply damage to defender and get remaining HP
-	var remaining_hp: int = defender.take_damage(damage_result.damage)
+	# Try to get board reference from scene tree
+	var board = attacker.get_parent().get_node_or_null("Board")
+	if board:
+		var attacker_terrain = board.get_terrain(attacker.grid_position)
+		var defender_terrain = board.get_terrain(defender.grid_position)
+		
+		if attacker_terrain:
+			attacker_terrain_bonus = attacker_terrain.attack_bonus
+		
+		if defender_terrain:
+			defender_terrain_bonus = defender_terrain.defense_bonus
 	
-	# Check if the defender was killed
-	var defender_died: bool = remaining_hp <= 0
+	# Calculate damage with terrain modifiers
+	var modified_atk = attacker.current_atk + attacker_terrain_bonus
+	var modified_def = defender.current_def + defender_terrain_bonus
+	
+	var damage_result = calculate_damage(modified_atk, modified_def)
+	
+	# Print terrain info
+	if attacker_terrain_bonus != 0 or defender_terrain_bonus != 0:
+		print("Terrain bonuses - ATK: +", attacker_terrain_bonus, ", DEF: +", defender_terrain_bonus)
+	
+	# Apply damage to defender
+	var remaining_hp = defender.take_damage(damage_result.damage)
+	
+	# Check if defender died
+	var defender_died = remaining_hp <= 0
 	if defender_died:
-		print("[CombatManager] ", defender.unit_data.unit_name if defender.unit_data else "Defender", " was KILLED!")
 		unit_died.emit(defender)
-	else:
-		print("[CombatManager] Defender HP remaining: ", remaining_hp)
 	
-	# Build comprehensive result dictionary
-	var result: Dictionary = {
+	# Build result dictionary
+	var result = {
 		"attacker": attacker,
 		"defender": defender,
 		"damage_dealt": damage_result.damage,
@@ -105,13 +121,8 @@ func resolve_combat(attacker, defender) -> Dictionary:
 		"defender_hp": remaining_hp
 	}
 	
-	# Emit signal with full results (UI can show damage numbers, etc.)
 	combat_resolved.emit(result)
-	
-	print("[CombatManager] === COMBAT END ===")
-	
 	return result
-
 # ============================================================================
 # COMBAT VALIDATION
 # ============================================================================

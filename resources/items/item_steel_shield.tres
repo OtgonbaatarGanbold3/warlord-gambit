@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemData" format=3 uid="uid://ctulrxg5l0igw"]
+
+[ext_resource type="Script" uid="uid://bf61c3lq172sq" path="res://scripts/core/item_data.gd" id="1_hux2e"]
+
+[resource]
+script = ExtResource("1_hux2e")
+item_name = "Steel Shield"
+slot_type = "ARMOR"
+def_bonus = 5
+description = "Sturdy steel shield. +5 DEF"
+metadata/_custom_type_script = "uid://bf61c3lq172sq"
