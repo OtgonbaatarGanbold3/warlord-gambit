@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://b3l5j2868x541"]
+
+[ext_resource type="Script" uid="uid://cajbjwgj2wim3" path="res://scripts/core/unit_data.gd" id="1_b1df8"]
+
+[resource]
+script = ExtResource("1_b1df8")
+unit_name = "Sagittarius"
+unit_type = "ELITE_ARCHER"
+base_hp = 40
+base_atk = 20
+base_speed = 9
+movement_range = 2
+attack_range = 3
+unit_description = "Long-range archer with precision shots."
+abilities = "Precision Shot - Increased crit chance"
+metadata/_custom_type_script = "uid://cajbjwgj2wim3"

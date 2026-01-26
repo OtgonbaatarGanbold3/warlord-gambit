@@ -165,6 +165,15 @@ func highlight_tiles(positions: Array[Vector2i], color: Color) -> void:
 	# Clear any existing highlights first
 	clear_highlights()
 	
+	# Add the highlights
+	add_highlights(positions, color)
+
+
+## Adds highlights without clearing existing ones
+## Use this to add multiple colors of highlights
+## @param positions: Array of grid positions to highlight
+## @param color: Base color for highlights (will be made semi-transparent)
+func add_highlights(positions: Array[Vector2i], color: Color) -> void:
 	for pos in positions:
 		if is_valid_position(pos):
 			# Create a new ColorRect overlay for each highlighted tile

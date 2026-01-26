@@ -39,7 +39,7 @@ enum Phase {
 # ============================================================================
 
 ## Current turn number (increments each time player's turn starts)
-var current_turn: int = 1
+var current_turn: int = 0
 
 ## Current game phase (determines available actions)
 var current_phase: Phase = Phase.PLAYER_PLANNING
@@ -72,6 +72,15 @@ signal phase_changed(new_phase: Phase)
 func _ready() -> void:
 	print("[TurnManager] Initialized - Turn ", current_turn, ", Phase: ", Phase.keys()[current_phase])
 
+
+## Resets the TurnManager to initial state (call when starting a new game)
+func reset_game() -> void:
+	print("[TurnManager] Resetting game state...")
+	current_turn = 0
+	current_phase = Phase.PLAYER_PLANNING
+	active_faction = "PLAYER"
+	print("[TurnManager] Game state reset complete")
+
 # ============================================================================
 # TURN MANAGEMENT
 # ============================================================================
@@ -93,7 +102,7 @@ func start_turn(faction: String) -> void:
 	
 	# Set the appropriate phase based on faction
 	if faction == "PLAYER":
-		set_phase(Phase.PLAYER_PLANNING)
+		set_phase(Phase.PLAYER_ACTION)
 	else:
 		set_phase(Phase.ENEMY_TURN)
 	

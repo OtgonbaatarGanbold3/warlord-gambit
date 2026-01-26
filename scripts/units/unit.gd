@@ -122,8 +122,8 @@ func initialize(data: UnitData, pos: Vector2i, is_player: bool) -> void:
 	current_speed = data.base_speed
 	
 	# Set visual texture if available
-	if visual and data.visual_texture:
-		visual.texture = data.visual_texture
+	if visual and data.sprite_texture:
+		visual.texture = data.sprite_texture
 	
 	# Update visual display
 	update_visuals()
@@ -316,8 +316,10 @@ func move_to(new_pos: Vector2i) -> void:
 ## Resets unit's turn state for a new turn
 ## Called at the start of each turn by TurnManager
 func reset_turn_state() -> void:
+	# Reset for new turn
 	has_moved = false
 	has_attacked = false
+	print("Reset turn state for unit at: ", grid_position)
 
 # ============================================================================
 # VISUAL UPDATES
@@ -325,46 +327,56 @@ func reset_turn_state() -> void:
 
 ## Updates all visual elements (HP label, visual tint)
 ## Call this after any stat changes
-func update_visuals() -> void:
-	# Update HP label text
+func update_visuals():
+	# Update HP label
 	if hp_label:
 		hp_label.text = "HP: %d/%d" % [current_hp, max_hp]
 	
-	# Apply damage tint when HP is low
+	# Update visual ColorRect
 	if visual:
-		var hp_percent: float = float(current_hp) / float(max_hp) if max_hp > 0 else 1.0
+		# Base color by faction
+		var base_color = Color.RED if faction == "ROMAN" else Color.SADDLE_BROWN
 		
-		if hp_percent < 0.3:
-			# Red tint when below 30% HP - unit is in danger!
-			visual.modulate = Color(1.0, 0.5, 0.5)
-		else:
-			# Normal color when healthy
-			visual.modulate = Color(1.0, 1.0, 1.0)
-	
-	# Placeholder coloring when no visual texture is assigned
-	# This helps with prototyping before art is ready
-	if visual and not visual.texture:
-		var base_color: Color
-		
-		# Color based on faction
-		match faction:
-			"ROMAN":
-				base_color = Color.RED
-			"BARBARIAN":
-				base_color = Color.ORANGE
-			"SAMURAI":
-				base_color = Color.BLUE
-			"UNDEAD":
-				base_color = Color.PURPLE
-			"DESERT":
-				base_color = Color.YELLOW
-			"VIKING":
-				base_color = Color.CYAN
-			_:
-				base_color = Color.GRAY
-		
-		# Darken enemy units to distinguish from player units
+		# Darken if enemy
 		if not is_player_unit:
 			base_color = base_color.darkened(0.3)
 		
-		visual.modulate = base_color
+		# Modify by unit type
+		match unit_type:
+			"HERO":
+				# Heroes are brighter/larger feeling
+				base_color = base_color.lightened(0.2)
+				if visual.size != Vector2(56, 56): # Make heroes slightly larger
+					visual.size = Vector2(56, 56)
+					visual.position = Vector2(-28, -28)
+			
+			"ELITE_WARRIOR":
+				# Warriors - normal size, saturated color
+				if visual.size != Vector2(48, 48):
+					visual.size = Vector2(48, 48)
+					visual.position = Vector2(-24, -24)
+			
+			"ELITE_ARCHER":
+				# Archers - slightly desaturated, feel lighter
+				base_color = base_color.lerp(Color.WHITE, 0.2)
+				if visual.size != Vector2(48, 48):
+					visual.size = Vector2(48, 48)
+					visual.position = Vector2(-24, -24)
+			
+			"PAWN":
+				# Pawns - smaller, darker
+				base_color = base_color.darkened(0.1)
+				if visual.size != Vector2(40, 40):
+					visual.size = Vector2(40, 40)
+					visual.position = Vector2(-20, -20)
+		
+		# HP-based color changes
+		var hp_percent = float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
+		if hp_percent < 0.3:
+			base_color = Color.DARK_RED
+		
+		# Gray out if unit has used all actions
+		if has_moved and has_attacked:
+			base_color = base_color.darkened(0.6)
+		
+		visual.color = base_color

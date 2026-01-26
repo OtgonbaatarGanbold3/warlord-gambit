@@ -1,0 +1,17 @@
+[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://b880nfq8i4hfs"]
+
+[ext_resource type="Script" uid="uid://cajbjwgj2wim3" path="res://scripts/core/unit_data.gd" id="1_dsaeg"]
+
+[resource]
+script = ExtResource("1_dsaeg")
+unit_name = "Warlord"
+unit_type = "HERO"
+faction = "BARBARIAN"
+base_hp = 120
+base_atk = 30
+base_def = 8
+base_speed = 12
+movement_range = 2
+unit_description = "Barbarian chieftain. High damage, low defense."
+abilities = "Berserker Rage - Gain ATK when damaged"
+metadata/_custom_type_script = "uid://cajbjwgj2wim3"
