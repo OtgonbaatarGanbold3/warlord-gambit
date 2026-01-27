@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://cfmi3ilh5b2mn"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://cfmi3ilh5b2mn"]
 
 [ext_resource type="Script" uid="uid://cajbjwgj2wim3" path="res://scripts/core/unit_data.gd" id="1_1468x"]
+[ext_resource type="Texture2D" uid="uid://bn6li44npg6ah" path="res://resources/unit_sprites/roman_pawn_idle.tres" id="2_g61b7"]
 
 [resource]
 script = ExtResource("1_1468x")
@@ -9,6 +10,7 @@ base_hp = 35
 base_atk = 12
 base_def = 8
 base_speed = 6
+sprite_texture = ExtResource("2_g61b7")
 unit_description = "Standard Roman infantry."
 abilities = " Formation - Stronger in groups"
 metadata/_custom_type_script = "uid://cajbjwgj2wim3"

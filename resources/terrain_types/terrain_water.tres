@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="TerrainData" format=3 uid="uid://bshwvhksgdify"]
 
 [ext_resource type="Script" uid="uid://bgs5o5rpjn31y" path="res://scripts/core/terrain_data.gd" id="1_3ko1y"]
+[ext_resource type="Texture2D" uid="uid://b1ygdsi2kqjlw" path="res://resources/terrain_types/atlas_water.tres" id="2_pka2k"]
 
 [resource]
 script = ExtResource("1_3ko1y")
@@ -9,4 +10,5 @@ terrain_type = "WATER"
 description = "Shallow water. Costs 2 movement, -2 DEF penalty."
 movement_cost = 2
 defense_bonus = -2
+tile_texture = ExtResource("2_pka2k")
 color = Color(0.016314592, 0.5667878, 0.6573372, 1)

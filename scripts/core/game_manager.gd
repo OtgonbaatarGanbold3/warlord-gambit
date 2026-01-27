@@ -518,11 +518,16 @@ func move_unit_to(unit, target_pos: Vector2i) -> void:
 	# Update unit's grid position
 	unit.grid_position = target_pos
 	
-	# Update unit's visual position on screen
-	unit.position = board.grid_to_world(target_pos)
-	
 	# Mark unit as having moved
 	unit.has_moved = true
+	
+	# Animate movement with Tween for smooth sliding
+	var target_world_pos: Vector2 = board.grid_to_world(target_pos)
+	var tween: Tween = create_tween()
+	tween.tween_property(unit, "position", target_world_pos, 0.3).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT)
+	
+	# Wait for animation to finish
+	await tween.finished
 	
 	# Set new position in board data
 	board.set_tile_data(target_pos, unit)
@@ -576,13 +581,39 @@ func attack_unit(attacker, defender) -> void:
 	
 	# Use CombatManager singleton to resolve combat
 	# Result is handled via combat_resolved signal callback
-	var _result: Dictionary = CombatManager.resolve_combat(attacker, defender)
+	var result: Dictionary = CombatManager.resolve_combat(attacker, defender)
+	
+	# Show floating damage number
+	show_damage_number(defender.position, result.damage_dealt, result.is_crit)
 	
 	# Mark attacker as having attacked this turn
 	attacker.has_attacked = true
 	
 	# Clear highlights and deselect
 	deselect_unit()
+
+
+## Shows a floating damage number at the specified position
+## @param pos: World position to spawn the number
+## @param damage: Damage amount to display
+## @param is_crit: Whether this was a critical hit (larger, yellow text)
+func show_damage_number(pos: Vector2, damage: int, is_crit: bool) -> void:
+	# Create a new label with the damage number script
+	var damage_label = Label.new()
+	var damage_script = load("res://scripts/ui/damage_number.gd")
+	damage_label.set_script(damage_script)
+	
+	# Set the damage text
+	damage_label.text = str(damage)
+	damage_label.position = pos + Vector2(-20, -40)
+	
+	# Style critical hits differently
+	if is_crit:
+		damage_label.text += "!"
+		damage_label.add_theme_color_override("font_color", Color.YELLOW)
+		damage_label.add_theme_font_size_override("font_size", 32)
+	
+	add_child(damage_label)
 
 # ============================================================================
 # UNIT DEATH HANDLING
@@ -642,7 +673,12 @@ func show_game_over_popup(title: String, message: String):
 	var popup = AcceptDialog.new()
 	popup.title = title
 	popup.dialog_text = message
-	popup.ok_button_text = "Restart"
+	
+	# Set button text based on outcome
+	if title == "VICTORY":
+		popup.ok_button_text = "Next Battle"
+	else:
+		popup.ok_button_text = "Restart"
 	
 	# Add to scene
 	add_child(popup)

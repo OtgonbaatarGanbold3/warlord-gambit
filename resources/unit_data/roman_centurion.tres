@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://jftgmcdagfg8"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://jftgmcdagfg8"]
 
 [ext_resource type="Script" uid="uid://cajbjwgj2wim3" path="res://scripts/core/unit_data.gd" id="1_7mg7u"]
+[ext_resource type="Texture2D" uid="uid://c7c72p82rnfjw" path="res://resources/unit_sprites/roman_warrior_idle.tres" id="2_4wofk"]
 
 [resource]
 script = ExtResource("1_7mg7u")
@@ -11,6 +12,7 @@ base_atk = 25
 base_def = 15
 base_speed = 10
 movement_range = 2
+sprite_texture = ExtResource("2_4wofk")
 unit_description = "Roman commander. High defense and leadership."
 abilities = "Shield Bash - Stun enemy for 1 turn"
 metadata/_custom_type_script = "uid://cajbjwgj2wim3"

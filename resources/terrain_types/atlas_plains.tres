@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" format=3 uid="uid://cbhxjaokye8wr"]
+
+[ext_resource type="Texture2D" uid="uid://246ip7v2d51f" path="res://assets/tiny_swords/Terrain/Ground/Tilemap_Flat.png" id="1_njonu"]
+
+[resource]
+atlas = ExtResource("1_njonu")
+region = Rect2(192, 192, 64, 64)

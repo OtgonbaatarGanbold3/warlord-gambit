@@ -1,9 +1,14 @@
 [gd_resource type="Resource" script_class="TerrainData" format=3 uid="uid://d1rc56j4pgrgs"]
 
 [ext_resource type="Script" uid="uid://bgs5o5rpjn31y" path="res://scripts/core/terrain_data.gd" id="1_t87hf"]
+[ext_resource type="Texture2D" uid="uid://246ip7v2d51f" path="res://assets/tiny_swords/Terrain/Ground/Tilemap_Flat.png" id="2_a77kp"]
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_v35m3"]
+atlas = ExtResource("2_a77kp")
+region = Rect2(192, 192, 64, 64)
 
 [resource]
 script = ExtResource("1_t87hf")
 terrain_name = "Plains"
 description = "Open terrain with no bonuses."
-color = Color(0.8392157, 0.70980394, 0.53333336, 1)
+tile_texture = SubResource("AtlasTexture_v35m3")

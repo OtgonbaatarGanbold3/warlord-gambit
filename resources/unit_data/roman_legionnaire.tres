@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://bqyfgccq5688p"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://bqyfgccq5688p"]
 
 [ext_resource type="Script" uid="uid://cajbjwgj2wim3" path="res://scripts/core/unit_data.gd" id="1_7p6js"]
+[ext_resource type="Texture2D" uid="uid://3yppoewiwq6" path="res://resources/unit_sprites/roman_hero_idle.tres" id="2_1vku4"]
 
 [resource]
 script = ExtResource("1_7p6js")
@@ -11,6 +12,7 @@ base_atk = 18
 base_def = 12
 base_speed = 8
 movement_range = 2
+sprite_texture = ExtResource("2_1vku4")
 unit_description = "Elite infantry with superior defense."
 abilities = "Phalanx - +5 DEF when adjacent to ally"
 metadata/_custom_type_script = "uid://cajbjwgj2wim3"

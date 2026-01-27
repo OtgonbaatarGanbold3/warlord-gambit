@@ -104,6 +104,8 @@ class_name TerrainData
 # VISUALS
 # =============================================================================
 
+@export var tile_texture: Texture2D
+
 ## Color tint applied to tiles of this terrain type
 ## Used for visual distinction on the game board
 ## Examples:

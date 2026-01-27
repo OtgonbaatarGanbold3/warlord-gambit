@@ -68,25 +68,26 @@ func _on_tile_clicked(grid_pos: Vector2i) -> void:
 	print("Tile clicked signal received at: ", grid_pos)
 
 
-## Creates the visual representation of the board using ColorRect nodes
-## Generates a checkerboard pattern for easy visualization
+## Creates the visual representation of the board using Sprite2D nodes
+## Generates a 10x10 grid of textured tiles
 func create_visual_board() -> void:
-	# Loop through each row and column to create tiles
+	# Create 10x10 grid of Sprite2D nodes for tiles
 	for row in range(BOARD_SIZE):
 		for col in range(BOARD_SIZE):
-			# Create a new ColorRect for this tile
-			var tile = ColorRect.new()
-			tile.size = Vector2(TILE_SIZE, TILE_SIZE)
-			tile.position = Vector2(col * TILE_SIZE, row * TILE_SIZE)
+			var tile = Sprite2D.new()
 			
-			# Apply checkerboard pattern for visual clarity
-			# Light tiles where (row + col) is even, dark tiles where odd
-			if (row + col) % 2 == 0:
-				tile.color = Color(0.9, 0.9, 0.8) # Light cream color
-			else:
-				tile.color = Color(0.7, 0.7, 0.6) # Darker tan color
+			# Position at center of tile
+			tile.position = Vector2(col * TILE_SIZE + TILE_SIZE / 2, row * TILE_SIZE + TILE_SIZE / 2)
 			
-			# Add tile to scene and track it in our array
+			# NO SCALING NEEDED - tiles are already 64x64!
+			tile.scale = Vector2(1.0, 1.0)
+			
+			# Pixel-perfect filtering
+			tile.texture_filter = CanvasItem.TEXTURE_FILTER_NEAREST
+			
+			# Centered
+			tile.centered = true
+			
 			add_child(tile)
 			tile_rects.append(tile)
 
@@ -229,16 +230,7 @@ func set_terrain(grid_pos: Vector2i, terrain: TerrainData) -> void:
 	terrain_data[grid_pos.y][grid_pos.x] = terrain
 	
 	# Update the tile's visual appearance
-	if terrain:
-		update_tile_visual_color(grid_pos, terrain.color)
-	else:
-		# Reset to default checkerboard color if terrain is cleared
-		var default_color: Color
-		if (grid_pos.y + grid_pos.x) % 2 == 0:
-			default_color = Color(0.9, 0.9, 0.8) # Light cream
-		else:
-			default_color = Color(0.7, 0.7, 0.6) # Dark tan
-		update_tile_visual_color(grid_pos, default_color)
+	update_tile_visual(grid_pos, terrain)
 
 
 ## Gets the terrain at a grid position
@@ -250,25 +242,40 @@ func get_terrain(grid_pos: Vector2i) -> TerrainData:
 	return terrain_data[grid_pos.y][grid_pos.x]
 
 
-## Updates the visual color of a tile to reflect its terrain
-## Maintains checkerboard pattern by blending terrain color with base tile color
+## Updates the visual appearance of a tile based on terrain data
+## Sets texture and applies color tints for different terrain types
 ## @param grid_pos: Grid coordinates of the tile to update
-## @param terrain_color: The terrain's color to apply
-func update_tile_visual_color(grid_pos: Vector2i, terrain_color: Color) -> void:
-	# Calculate tile index in the flat tile_rects array
-	# Tiles are stored row by row: index = row * BOARD_SIZE + col
-	var tile_index: int = grid_pos.y * BOARD_SIZE + grid_pos.x
-	
+## @param terrain: TerrainData resource containing texture and type info
+func update_tile_visual(grid_pos: Vector2i, terrain: TerrainData) -> void:
+	var tile_index = grid_pos.y * BOARD_SIZE + grid_pos.x
 	if tile_index >= 0 and tile_index < tile_rects.size():
-		# Blend terrain color with checkerboard pattern for visual variety
-		var base_brightness: float = 1.0 if (grid_pos.y + grid_pos.x) % 2 == 0 else 0.85
-		var blended_color = Color(
-			terrain_color.r * base_brightness,
-			terrain_color.g * base_brightness,
-			terrain_color.b * base_brightness,
-			terrain_color.a
-		)
-		tile_rects[tile_index].color = blended_color
+		var tile_sprite = tile_rects[tile_index]
+		
+		# Set texture from terrain
+		if terrain and terrain.tile_texture:
+			tile_sprite.texture = terrain.tile_texture
+			
+			# Apply checkerboard darkening for visual variety (optional)
+			if (grid_pos.y + grid_pos.x) % 2 == 1:
+				tile_sprite.modulate = Color(0.9, 0.9, 0.9)
+			else:
+				tile_sprite.modulate = Color(1.0, 1.0, 1.0)
+			
+			# Special tints for certain terrains
+			match terrain.terrain_type:
+				"MOUNTAIN":
+					# Tint toward gray
+					tile_sprite.modulate = Color(0.7, 0.7, 0.7)
+				"LAVA":
+					# Tint toward red/orange
+					tile_sprite.modulate = Color(1.0, 0.5, 0.3)
+				"WATER":
+					# Slight blue tint
+					tile_sprite.modulate = Color(0.9, 0.9, 1.0)
+		else:
+			# Fallback to solid color if no texture
+			tile_sprite.texture = null
+			# For ColorRect fallback, we'd need different approach
 
 
 ## Generates random terrain across the board for tactical variety

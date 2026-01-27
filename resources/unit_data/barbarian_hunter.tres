@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://bxc1x1md34r28"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://bxc1x1md34r28"]
 
 [ext_resource type="Script" uid="uid://cajbjwgj2wim3" path="res://scripts/core/unit_data.gd" id="1_6gqfm"]
+[ext_resource type="Texture2D" uid="uid://djnwidtkkia7g" path="res://resources/unit_sprites/barbarian_hunter_idle.tres" id="2_86xl8"]
 
 [resource]
 script = ExtResource("1_6gqfm")
@@ -13,6 +14,7 @@ base_def = 4
 base_speed = 11
 movement_range = 2
 attack_range = 3
+sprite_texture = ExtResource("2_86xl8")
 unit_description = "Fast hunter with deadly aim."
 abilities = " Rapid Fire - Attack twice"
 metadata/_custom_type_script = "uid://cajbjwgj2wim3"

@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" format=3 uid="uid://djnwidtkkia7g"]
+
+[ext_resource type="Texture2D" uid="uid://bqi353b42keus" path="res://assets/tiny_swords/Factions/Goblins/Troops/Torch/Red/Torch_Red.png" id="1_j2lgm"]
+
+[resource]
+atlas = ExtResource("1_j2lgm")
+region = Rect2(0, 0, 192, 192)

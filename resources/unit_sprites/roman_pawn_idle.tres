@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" format=3 uid="uid://bn6li44npg6ah"]
+
+[ext_resource type="Texture2D" uid="uid://d3c3qyt6jbac4" path="res://assets/tiny_swords/Factions/Knights/Troops/Pawn/Blue/Pawn_Blue.png" id="1_v06ep"]
+
+[resource]
+atlas = ExtResource("1_v06ep")
+region = Rect2(0, 0, 192, 192)

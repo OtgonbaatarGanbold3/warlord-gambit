@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://cljutfhoejd11"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://cljutfhoejd11"]
 
 [ext_resource type="Script" uid="uid://cajbjwgj2wim3" path="res://scripts/core/unit_data.gd" id="1_80qew"]
+[ext_resource type="Texture2D" uid="uid://brylswm0yogs6" path="res://resources/unit_sprites/barbarian_berserker_idle.tres" id="2_fyjl1"]
 
 [resource]
 script = ExtResource("1_80qew")
@@ -11,6 +12,7 @@ base_hp = 70
 base_atk = 25
 base_speed = 10
 movement_range = 2
+sprite_texture = ExtResource("2_fyjl1")
 unit_description = "Aggressive warrior with high damage."
 abilities = "Cleave - Damage adjacent enemies	"
 metadata/_custom_type_script = "uid://cajbjwgj2wim3"

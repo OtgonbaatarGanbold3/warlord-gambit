@@ -1,6 +1,7 @@
-[gd_resource type="Resource" script_class="UnitData" load_steps=2 format=3 uid="uid://dwlwoays1yt3m"]
+[gd_resource type="Resource" script_class="UnitData" format=3 uid="uid://dwlwoays1yt3m"]
 
 [ext_resource type="Script" uid="uid://cajbjwgj2wim3" path="res://scripts/core/unit_data.gd" id="1_4mrap"]
+[ext_resource type="Texture2D" uid="uid://cjoequ7tf6igr" path="res://resources/unit_sprites/barbarian_pawn_idle.tres" id="2_8kpdp"]
 
 [resource]
 script = ExtResource("1_4mrap")
@@ -10,6 +11,7 @@ base_hp = 40
 base_atk = 14
 base_def = 4
 base_speed = 7
+sprite_texture = ExtResource("2_8kpdp")
 unit_description = "Fierce barbarian warrior."
 abilities = "Blood Frenzy - Stronger when low HP"
 metadata/_custom_type_script = "uid://cajbjwgj2wim3"

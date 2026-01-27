@@ -1,6 +1,7 @@
 [gd_resource type="Resource" script_class="TerrainData" format=3 uid="uid://c355tuwpowdyh"]
 
 [ext_resource type="Script" uid="uid://bgs5o5rpjn31y" path="res://scripts/core/terrain_data.gd" id="1_23air"]
+[ext_resource type="Texture2D" uid="uid://cfpxr4actq4fw" path="res://resources/terrain_types/atlas_grass.tres" id="2_tgjop"]
 
 [resource]
 script = ExtResource("1_23air")
@@ -9,4 +10,5 @@ terrain_type = "FOREST"
 description = "Dense forest. +5 DEF, provides cover from ranged attacks."
 defense_bonus = 5
 provides_cover = true
+tile_texture = ExtResource("2_tgjop")
 color = Color(6.196834e-07, 0.2790341, 0.097907655, 1)

@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" format=3 uid="uid://cmvlajsgge880"]
+
+[ext_resource type="Texture2D" uid="uid://cx5pd8wbkyxvw" path="res://assets/tiny_swords/Factions/Knights/Troops/Archer/Archer + Bow/Archer_Red_(NoArms).png" id="1_hwrky"]
+
+[resource]
+atlas = ExtResource("1_hwrky")
+region = Rect2(0, 0, 192, 192)

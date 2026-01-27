@@ -50,6 +50,10 @@ class_name UnitData
 ## Assign a Texture2D resource (PNG, etc.) from the assets/sprites folder
 @export var sprite_texture: Texture2D
 
+@export var sprite_hframes: int = 6 # Columns in sprite sheet
+@export var sprite_vframes: int = 8 # Rows in sprite sheet
+@export var sprite_frame: int = 0 # Which frame to use (0 = first)
+
 ## Short description of the unit for UI tooltips
 @export var unit_description: String = ""
 

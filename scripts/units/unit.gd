@@ -19,7 +19,7 @@ class_name Unit
 # ============================================================================
 
 ## Reference to the unit's visual for visual display
-@onready var visual: ColorRect = $Visual
+@onready var visual: Sprite2D = $Visual
 
 ## Reference to the collision shape for click detection
 @onready var collision: CollisionShape2D = $CollisionShape2D
@@ -101,36 +101,42 @@ signal moved(from_pos: Vector2i, to_pos: Vector2i)
 ## @param data: UnitData resource containing base stats
 ## @param pos: Starting grid position
 ## @param is_player: True if player-controlled, false if enemy
-func initialize(data: UnitData, pos: Vector2i, is_player: bool) -> void:
-	# Store references
+func initialize(data: UnitData, pos: Vector2i, is_player: bool):
+	print("\n=== Initializing Unit ===")
+	print("Position: ", pos)
+	print("UnitData exists: ", data != null)
+	
 	unit_data = data
 	grid_position = pos
 	is_player_unit = is_player
 	
-	# Safety check for null data
-	if data == null:
-		push_error("Unit.initialize() called with null UnitData!")
-		return
+	if data:
+		print("Unit name: ", data.unit_name)
+		print("Sprite texture exists: ", data.sprite_texture != null)
+		
+		faction = data.faction
+		unit_type = data.unit_type
+		max_hp = data.base_hp
+		current_hp = max_hp
+		current_atk = data.base_atk
+		current_def = data.base_def
+		current_speed = data.base_speed
+		
+		if visual:
+			print("Visual node found: Sprite2D")
+			
+			if data.sprite_texture:
+				visual.texture = data.sprite_texture
+				print("✅ Texture assigned successfully!")
+				print("Texture size: ", data.sprite_texture.get_size())
+			else:
+				print("❌ ERROR: sprite_texture is null in UnitData!")
+		else:
+			print("❌ ERROR: Visual node not found!")
 	
-	# Copy base stats from unit_data
-	faction = data.faction
-	unit_type = data.unit_type
-	max_hp = data.base_hp
-	current_hp = max_hp
-	current_atk = data.base_atk
-	current_def = data.base_def
-	current_speed = data.base_speed
-	
-	# Set visual texture if available
-	if visual and data.sprite_texture:
-		visual.texture = data.sprite_texture
-	
-	# Update visual display
 	update_visuals()
-	
-	print("Unit initialized: ", data.unit_name, " at ", pos)
+	print("=== Unit Init Complete ===\n")
 
-# ============================================================================
 # COMBAT METHODS
 # ============================================================================
 
@@ -332,51 +338,17 @@ func update_visuals():
 	if hp_label:
 		hp_label.text = "HP: %d/%d" % [current_hp, max_hp]
 	
-	# Update visual ColorRect
+	# Update visual sprite
 	if visual:
-		# Base color by faction
-		var base_color = Color.RED if faction == "ROMAN" else Color.SADDLE_BROWN
-		
-		# Darken if enemy
-		if not is_player_unit:
-			base_color = base_color.darkened(0.3)
-		
-		# Modify by unit type
-		match unit_type:
-			"HERO":
-				# Heroes are brighter/larger feeling
-				base_color = base_color.lightened(0.2)
-				if visual.size != Vector2(56, 56): # Make heroes slightly larger
-					visual.size = Vector2(56, 56)
-					visual.position = Vector2(-28, -28)
-			
-			"ELITE_WARRIOR":
-				# Warriors - normal size, saturated color
-				if visual.size != Vector2(48, 48):
-					visual.size = Vector2(48, 48)
-					visual.position = Vector2(-24, -24)
-			
-			"ELITE_ARCHER":
-				# Archers - slightly desaturated, feel lighter
-				base_color = base_color.lerp(Color.WHITE, 0.2)
-				if visual.size != Vector2(48, 48):
-					visual.size = Vector2(48, 48)
-					visual.position = Vector2(-24, -24)
-			
-			"PAWN":
-				# Pawns - smaller, darker
-				base_color = base_color.darkened(0.1)
-				if visual.size != Vector2(40, 40):
-					visual.size = Vector2(40, 40)
-					visual.position = Vector2(-20, -20)
-		
-		# HP-based color changes
+		# Change sprite tint based on HP
 		var hp_percent = float(current_hp) / float(max_hp) if max_hp > 0 else 0.0
+		
 		if hp_percent < 0.3:
-			base_color = Color.DARK_RED
-		
-		# Gray out if unit has used all actions
-		if has_moved and has_attacked:
-			base_color = base_color.darkened(0.6)
-		
-		visual.color = base_color
+			# Low HP - red tint
+			visual.modulate = Color(1.0, 0.5, 0.5)
+		elif has_moved and has_attacked:
+			# Used all actions - darkened
+			visual.modulate = Color(0.6, 0.6, 0.6)
+		else:
+			# Normal
+			visual.modulate = Color(1.0, 1.0, 1.0)
