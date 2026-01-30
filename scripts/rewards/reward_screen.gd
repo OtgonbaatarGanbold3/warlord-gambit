@@ -44,24 +44,24 @@ var enemies_defeated: int = 0
 # REWARD POOLS
 # =============================================================================
 
-## Available unit rewards (paths to .tres files)
 const UNIT_REWARD_POOL: Array[String] = [
 	"res://resources/unit_data/roman_pawn.tres",
 	"res://resources/unit_data/roman_legionnaire.tres",
 	"res://resources/unit_data/roman_archer.tres",
-	"res://resources/unit_data/barbarian_warrior.tres",
+	"res://resources/unit_data/barbarian_pawn.tres",
 	"res://resources/unit_data/barbarian_berserker.tres",
 	"res://resources/unit_data/barbarian_hunter.tres",
 ]
 
 ## Available item rewards (paths to .tres files)
 const ITEM_REWARD_POOL: Array[String] = [
-	"res://resources/items/iron_sword.tres",
-	"res://resources/items/steel_shield.tres",
-	"res://resources/items/health_amulet.tres",
-	"res://resources/items/boots_of_speed.tres",
+	"res://resources/items/item_iron_sword.tres",
+	"res://resources/items/item_steel_shield.tres",
+	"res://resources/items/item_health_amulet.tres",
+	"res://resources/items/item_boots_speed.tres",
+	"res://resources/items/item_flame_sword.tres",
+	"res://resources/items/item_dragon_armor.tres",
 ]
-
 # =============================================================================
 # LIFECYCLE
 # =============================================================================

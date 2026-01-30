@@ -168,26 +168,11 @@ func _start_combat(node_index: int, is_elite: bool) -> void:
 
 func _start_event(node_index: int) -> void:
 	print("[RegionMap] Starting event at node %d" % node_index)
+	get_tree().change_scene_to_file("res://scenes/events/event_screen.tscn")
 	
-	# TEMPORARY: Auto-complete
-	RunManager.completed_nodes.append(node_index)
-	RunManager.current_node = node_index + 1
-	_update_ui()
-	
-	print("[RegionMap] (Event scene not created yet - auto-completing for testing)")
-
-
 func _open_shop() -> void:
 	print("[RegionMap] Opening shop")
-	
-	# TEMPORARY: Auto-complete
-	var node_index = RunManager.current_node
-	RunManager.completed_nodes.append(node_index)
-	RunManager.current_node = node_index + 1
-	_update_ui()
-	
-	print("[RegionMap] (Shop scene not created yet - auto-completing for testing)")
-
+	get_tree().change_scene_to_file("res://scenes/shop/shop_screen.tscn")
 
 func _start_boss_battle() -> void:
 	print("[RegionMap] Starting BOSS battle!")
