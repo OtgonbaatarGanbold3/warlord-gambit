@@ -1,6 +1,6 @@
-[gd_scene format=3 uid="uid://grifs2xobdq7"]
+[gd_scene format=3 uid="uid://yebtxhj571wc"]
 
-[ext_resource type="Script" uid="uid://btr2v76hxcgli" path="res://scripts/core/board.gd" id="1_s78fa"]
+[ext_resource type="Script" uid="uid://btr2v76hxcgli" path="res://scripts/core/board.gd" id="1_6puts"]
 
-[node name="Board" type="Node2D" unique_id=409030399]
-script = ExtResource("1_s78fa")
+[node name="Board" type="Node2D" unique_id=131028332]
+script = ExtResource("1_6puts")

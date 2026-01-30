@@ -15,12 +15,13 @@ compatibility/default_parent_skeleton_in_mesh_instance_3d=true
 [application]
 
 config/name="WarlordGambit"
-run/main_scene="uid://cl40nu62p24cy"
+run/main_scene="uid://dfxhdiuve6l60"
 config/features=PackedStringArray("4.6", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
+RunManager="*uid://bgcj418u58r4p"
 CombatManager="*res://scripts/systems/combat_manager.gd"
 TurnManager="*res://scripts/systems/turn_manager.gd"
 ItemManager="*uid://dsup25mugcmx"

@@ -896,3 +896,8 @@ func _input(event: InputEvent) -> void:
 				print("[DEBUG] No items available to equip")
 		else:
 			print("[DEBUG] Select a player unit first to equip items")
+	
+	# TEMPORARY: Press V to simulate victory (for testing)
+	if event is InputEventKey and event.pressed and event.keycode == KEY_V:
+		print("[GameManager] DEBUG: Simulating victory!")
+		get_tree().change_scene_to_file("res://scenes/rewards/reward_screen.tscn")

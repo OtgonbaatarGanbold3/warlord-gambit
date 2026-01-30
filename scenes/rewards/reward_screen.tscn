@@ -1,0 +1,163 @@
+[gd_scene format=3 uid="uid://dx6r46vuqd5j4"]
+
+[ext_resource type="Script" uid="uid://0wtb2cwriqrc" path="res://scripts/rewards/reward_screen.gd" id="1_bt4t1"]
+
+[node name="RewardScreen" type="Control" unique_id=1058794522]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_bt4t1")
+
+[node name="Background" type="ColorRect" parent="." unique_id=879029904]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18039216, 0.16470589, 0.101960786, 1)
+
+[node name="VictoryLabel" type="Label" parent="." unique_id=1907915699]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -57.5
+offset_top = 30.0
+offset_right = 57.5
+offset_bottom = 53.0
+grow_horizontal = 2
+text = "⚔️ VICTORY! ⚔️"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="." unique_id=975462597]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -80.5
+offset_top = 70.0
+offset_right = 80.5
+offset_bottom = 93.0
+grow_horizontal = 2
+text = "Choose Your Reward"
+horizontal_alignment = 1
+
+[node name="RewardContainer" type="HBoxContainer" parent="." unique_id=711430640]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+
+[node name="UnitCard" type="PanelContainer" parent="RewardContainer" unique_id=894149172]
+custom_minimum_size = Vector2(180, 250)
+layout_mode = 2
+
+[node name="UnitCardContent" type="VBoxContainer" parent="RewardContainer/UnitCard" unique_id=1125840714]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="UnitTypeLabel" type="Label" parent="RewardContainer/UnitCard/UnitCardContent" unique_id=1588409281]
+layout_mode = 2
+text = "🗡️ UNIT"
+horizontal_alignment = 1
+
+[node name="UnitNameLabel" type="Label" parent="RewardContainer/UnitCard/UnitCardContent" unique_id=753389026]
+layout_mode = 2
+text = "Unit Name"
+horizontal_alignment = 1
+
+[node name="UnitStatsLabel" type="Label" parent="RewardContainer/UnitCard/UnitCardContent" unique_id=2117717768]
+layout_mode = 2
+text = "HP:0 ATK:0 DEF:0"
+horizontal_alignment = 1
+
+[node name="UnitSelectButton" type="Button" parent="RewardContainer/UnitCard/UnitCardContent" unique_id=1985861466]
+layout_mode = 2
+text = "Select"
+
+[node name="ItemCard" type="PanelContainer" parent="RewardContainer" unique_id=1326700345]
+custom_minimum_size = Vector2(180, 250)
+layout_mode = 2
+
+[node name="ItemCardContent" type="VBoxContainer" parent="RewardContainer/ItemCard" unique_id=1514527830]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="ItemTypeLabel" type="Label" parent="RewardContainer/ItemCard/ItemCardContent" unique_id=683475009]
+layout_mode = 2
+text = "🛡️ ITEM"
+horizontal_alignment = 1
+
+[node name="ItemNameLabel" type="Label" parent="RewardContainer/ItemCard/ItemCardContent" unique_id=2090570701]
+layout_mode = 2
+text = "Item Name"
+horizontal_alignment = 1
+
+[node name="ItemStatsLabel" type="Label" parent="RewardContainer/ItemCard/ItemCardContent" unique_id=2140948691]
+layout_mode = 2
+text = "+0 ATK"
+horizontal_alignment = 1
+
+[node name="ItemSelectButton" type="Button" parent="RewardContainer/ItemCard/ItemCardContent" unique_id=990580665]
+layout_mode = 2
+text = "Select"
+
+[node name="GoldCard" type="PanelContainer" parent="RewardContainer" unique_id=1887957410]
+custom_minimum_size = Vector2(180, 250)
+layout_mode = 2
+
+[node name="GoldCardContent" type="VBoxContainer" parent="RewardContainer/GoldCard" unique_id=1665497506]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="GoldTypeLabel" type="Label" parent="RewardContainer/GoldCard/GoldCardContent" unique_id=1398007428]
+layout_mode = 2
+text = " 💰 GOLD
+"
+horizontal_alignment = 1
+
+[node name="GoldAmountLabel" type="Label" parent="RewardContainer/GoldCard/GoldCardContent" unique_id=1508553388]
+layout_mode = 2
+text = "150 Gold"
+horizontal_alignment = 1
+
+[node name="GoldDescLabel" type="Label" parent="RewardContainer/GoldCard/GoldCardContent" unique_id=1423834019]
+layout_mode = 2
+text = "Add to treasury"
+horizontal_alignment = 1
+
+[node name="GoldSelectButton" type="Button" parent="RewardContainer/GoldCard/GoldCardContent" unique_id=1260537144]
+layout_mode = 2
+text = "Select"
+
+[node name="StatsLabel" type="Label" parent="." unique_id=1608175539]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -140.5
+offset_top = -79.0
+offset_right = 140.5
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Enemies Defeated: 0 | Gold Bonus: 0"
+horizontal_alignment = 1

@@ -1,0 +1,88 @@
+[gd_scene format=3 uid="uid://dfxhdiuve6l60"]
+
+[ext_resource type="Script" uid="uid://dem11g1stxl0i" path="res://scripts/maps/world_map.gd" id="1_t8odc"]
+
+[node name="WorldMap" type="Control" unique_id=421071484]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_t8odc")
+
+[node name="Background" type="ColorRect" parent="." unique_id=194218486]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.101960786, 0.101960786, 0.18039216, 1)
+
+[node name="TitleLabel" type="Label" parent="." unique_id=1433868271]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -128.0
+offset_right = 128.0
+offset_bottom = 23.0
+grow_horizontal = 2
+text = "WARLORD'S GAMBIT - World Map"
+horizontal_alignment = 1
+
+[node name="RegionContainer" type="HBoxContainer" parent="." unique_id=156741222]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 50
+
+[node name="Region1Button" type="Button" parent="RegionContainer" unique_id=2085144102]
+custom_minimum_size = Vector2(150, 100)
+layout_mode = 2
+text = "BORDERLANDS\\n(Easy)"
+
+[node name="Region2Button" type="Button" parent="RegionContainer" unique_id=1294515291]
+custom_minimum_size = Vector2(150, 100)
+layout_mode = 2
+disabled = true
+text = "NORTHERN HOLDS\\n(Medium)\\n🔒"
+
+[node name="Region3Button" type="Button" parent="RegionContainer" unique_id=294942502]
+custom_minimum_size = Vector2(150, 100)
+layout_mode = 2
+disabled = true
+text = "SOUTHERN WASTES\\n(Hard)\\n🔒"
+
+[node name="GoldLabel" type="Label" parent="." unique_id=982963996]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_top = -23.0
+offset_right = 72.0
+grow_vertical = 0
+text = "Gold: 100"
+
+[node name="ArmyLabel" type="Label" parent="." unique_id=1817510060]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -103.0
+offset_top = -23.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Army: 5 units"

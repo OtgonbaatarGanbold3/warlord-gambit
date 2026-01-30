@@ -1,0 +1,139 @@
+[gd_scene format=3 uid="uid://be13s6hggycis"]
+
+[ext_resource type="Script" uid="uid://efh7rbrsg38w" path="res://scripts/deployment/deployment_screen.gd" id="1_6qdsk"]
+
+[node name="DeploymentScreen" type="Control" unique_id=1506721895]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_6qdsk")
+
+[node name="Background" type="ColorRect" parent="." unique_id=881163891]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18039216, 0.101960786, 0.101960786, 1)
+
+[node name="TitleLabel" type="Label" parent="." unique_id=1106056574]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -69.5
+offset_top = 20.0
+offset_right = 69.5
+offset_bottom = 43.0
+grow_horizontal = 2
+text = "Prepare for Battle"
+horizontal_alignment = 1
+
+[node name="MainContainer" type="HBoxContainer" parent="." unique_id=1174406539]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 60.0
+offset_bottom = -80.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+
+[node name="ArmyPanel" type="VBoxContainer" parent="MainContainer" unique_id=588728183]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="ArmyLabel" type="Label" parent="MainContainer/ArmyPanel" unique_id=69990383]
+layout_mode = 2
+text = "YOUR ARMY (Available)"
+horizontal_alignment = 1
+
+[node name="ArmyList" type="ItemList" parent="MainContainer/ArmyPanel" unique_id=1533166639]
+custom_minimum_size = Vector2(0, 200)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="WoundedLabel" type="Label" parent="MainContainer/ArmyPanel" unique_id=1541388482]
+layout_mode = 2
+text = "WOUNDED (Unavailable)"
+horizontal_alignment = 1
+
+[node name="WoundedList" type="ItemList" parent="MainContainer/ArmyPanel" unique_id=209317014]
+custom_minimum_size = Vector2(0, 80)
+layout_mode = 2
+allow_search = false
+
+[node name="SquadPanel" type="VBoxContainer" parent="MainContainer" unique_id=501757436]
+layout_mode = 2
+size_flags_horizontal = 3
+theme_override_constants/separation = 10
+
+[node name="SquadLabel" type="Label" parent="MainContainer/SquadPanel" unique_id=290932844]
+layout_mode = 2
+text = "BATTLE SQUAD (8 max)"
+horizontal_alignment = 1
+
+[node name="SquadList" type="ItemList" parent="MainContainer/SquadPanel" unique_id=1070303527]
+custom_minimum_size = Vector2(0, 300)
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="ButtonContainer" type="HBoxContainer" parent="." unique_id=843245137]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = -71.0
+offset_bottom = -40.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="BackButton" type="Button" parent="ButtonContainer" unique_id=1793332728]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "← BACK"
+
+[node name="AddButton" type="Button" parent="ButtonContainer" unique_id=1185388517]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "ADD ▶
+"
+
+[node name="RemoveButton" type="Button" parent="ButtonContainer" unique_id=605088326]
+custom_minimum_size = Vector2(100, 0)
+layout_mode = 2
+text = "◀ REMOVE"
+
+[node name="AutoDeployButton" type="Button" parent="ButtonContainer" unique_id=1027798344]
+custom_minimum_size = Vector2(120, 0)
+layout_mode = 2
+text = "AUTO-DEPLOY"
+
+[node name="StartBattleButton" type="Button" parent="ButtonContainer" unique_id=1069454496]
+custom_minimum_size = Vector2(140, 0)
+layout_mode = 2
+text = "START BATTLE ⚔️"
+
+[node name="SquadCountLabel" type="Label" parent="." unique_id=1269877496]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -102.0
+offset_top = -43.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 0
+grow_vertical = 0
+text = "Squad: 0/8"

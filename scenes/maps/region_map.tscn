@@ -1,0 +1,106 @@
+[gd_scene format=3 uid="uid://cw30ticeihnmx"]
+
+[ext_resource type="Script" uid="uid://dx0hdkiiqr1j" path="res://scripts/maps/region_map.gd" id="1_incyp"]
+
+[node name="RegionMap" type="Control" unique_id=66408416]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_incyp")
+
+[node name="Background" type="ColorRect" parent="." unique_id=666453961]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.101960786, 0.18039216, 0.101960786, 1)
+
+[node name="TitleLabel" type="Label" parent="." unique_id=890383501]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -58.5
+offset_top = 20.0
+offset_right = 58.5
+offset_bottom = 43.0
+grow_horizontal = 2
+text = "BORDERLANDS"
+horizontal_alignment = 1
+
+[node name="NodeContainer" type="HBoxContainer" parent="." unique_id=378832387]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+
+[node name="Node1" type="Button" parent="NodeContainer" unique_id=920272621]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+text = "⚔️\\nCOMBAT"
+
+[node name="Node2" type="Button" parent="NodeContainer" unique_id=438227570]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+disabled = true
+text = "⚔️\\nCOMBAT"
+
+[node name="Node3" type="Button" parent="NodeContainer" unique_id=1936338717]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+disabled = true
+text = "❓\\nEVENT"
+
+[node name="Node4" type="Button" parent="NodeContainer" unique_id=225092425]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+disabled = true
+text = "🛒\\nSHOP"
+
+[node name="Node5" type="Button" parent="NodeContainer" unique_id=2112974278]
+custom_minimum_size = Vector2(80, 80)
+layout_mode = 2
+disabled = true
+text = " 💀\\nBOSS
+"
+
+[node name="InfoLabel" type="Label" parent="." unique_id=1882574332]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -166.0
+offset_top = -83.0
+offset_right = 166.0
+offset_bottom = -60.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "Current Node: 1 | Gold: 100 | Army: 5 units"
+
+[node name="BackButton" type="Button" parent="." unique_id=1077943625]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -51.0
+offset_right = 218.0
+offset_bottom = -20.0
+grow_vertical = 0
+text = "← BACK TO WORLD MAP"
