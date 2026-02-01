@@ -1,0 +1,94 @@
+[gd_scene format=3 uid="uid://b7ymxpf2xv21d"]
+
+[ext_resource type="Script" uid="uid://b75bj7ra2emkq" path="res://scripts/game_over/defeat_screen.gd" id="1_vpjbu"]
+
+[node name="DefeatScreen" type="Control" unique_id=407400916]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_vpjbu")
+
+[node name="Background" type="ColorRect" parent="." unique_id=258422034]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.18039216, 0.101960786, 0.101960786, 1)
+
+[node name="TitleLabel" type="Label" parent="." unique_id=1896110197]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -51.0
+offset_top = -111.5
+offset_right = 51.0
+offset_bottom = -88.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "💀 DEFEAT 💀"
+horizontal_alignment = 1
+
+[node name="MessageLabel" type="Label" parent="." unique_id=681219931]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -105.0
+offset_top = -41.5
+offset_right = 105.0
+offset_bottom = -18.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Your army was destroyed..."
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="." unique_id=2145287072]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -143.0
+offset_top = 8.5
+offset_right = 143.0
+offset_bottom = 31.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Battles Won: 0 | Enemies Defeated: 0"
+horizontal_alignment = 1
+
+[node name="ButtonContainer" type="HBoxContainer" parent="." unique_id=527894509]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = 60.0
+offset_right = 20.0
+offset_bottom = 100.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+
+[node name="RetryButton" type="Button" parent="ButtonContainer" unique_id=1632745292]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "TRY AGAIN"
+
+[node name="MainMenuButton" type="Button" parent="ButtonContainer" unique_id=432427920]
+custom_minimum_size = Vector2(150, 0)
+layout_mode = 2
+text = "MAIN MENU"

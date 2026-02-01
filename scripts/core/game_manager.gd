@@ -76,6 +76,8 @@ var current_state: GameState = GameState.SELECTING
 
 ## Called when node enters scene tree
 ## Sets up the game board, spawns units, and connects signals
+## Called when node enters scene tree
+## Sets up the game board, spawns units, and connects signals
 func _ready() -> void:
 	print("[GameManager] Initializing game...")
 	
@@ -85,14 +87,21 @@ func _ready() -> void:
 	# Setup in order: board -> units -> signals -> start turn
 	setup_board()
 	board.generate_random_terrain()
-	spawn_test_units()
+	
+	# Check if this is a roguelike run with deployed units
+	if RunManager.run_active and RunManager.active_squad.size() > 0:
+		print("[GameManager] Spawning player's deployed squad...")
+		spawn_deployed_units()
+	else:
+		print("[GameManager] No active run - spawning test units...")
+		spawn_test_units()
+	
 	connect_signals()
 	
 	# Start the first turn
 	TurnManager.start_turn("PLAYER")
 	
 	print("[GameManager] Game initialization complete!")
-
 
 ## Connects to the board's tile_clicked signal for input handling
 func setup_board() -> void:
@@ -172,6 +181,187 @@ func spawn_test_units() -> void:
 	# ----- PRINT ARMY COMPOSITION -----
 	_print_army_composition()
 
+
+## Spawns the player's deployed squad and enemy units for the current battle
+## Uses RunManager.active_squad for player units
+func spawn_deployed_units() -> void:
+	print("[GameManager] Spawning deployed units...")
+	
+	# Load the Unit scene
+	var unit_scene = preload("res://scenes/units/unit.tscn")
+	
+	if unit_scene == null:
+		push_error("[GameManager] ERROR: Could not load unit scene!")
+		return
+	
+	# Get board dimensions
+	var board_width = board.board_width if board.get("board_width") else 8
+	var board_height = board.board_height if board.get("board_height") else 8
+	
+	# ===================
+	# SPAWN PLAYER UNITS
+	# ===================
+	
+	# Player units spawn on left side (columns 0-1)
+	var player_spawn_positions: Array[Vector2i] = []
+	for y in range(board_height):
+		for x in range(2): # First 2 columns
+			player_spawn_positions.append(Vector2i(x, y))
+	
+	# Shuffle spawn positions for variety
+	player_spawn_positions.shuffle()
+	
+	# Spawn each unit from active squad
+	var spawn_index = 0
+	for unit_data in RunManager.active_squad:
+		if spawn_index >= player_spawn_positions.size():
+			push_warning("[GameManager] Not enough spawn positions for all player units!")
+			break
+		
+		var spawn_pos = player_spawn_positions[spawn_index]
+		
+		# Make sure position is walkable and empty
+		while not _is_valid_spawn_position(spawn_pos) and spawn_index < player_spawn_positions.size() - 1:
+			spawn_index += 1
+			spawn_pos = player_spawn_positions[spawn_index]
+		
+		# Create and setup unit
+		var unit_instance = unit_scene.instantiate()
+		unit_instance.grid_position = spawn_pos
+		unit_instance.position = board.grid_to_world(spawn_pos)
+		unit_instance.unit_data = unit_data
+		unit_instance.is_player_unit = true
+		
+		# Add to scene and tracking
+		add_child(unit_instance)
+		player_units.append(unit_instance)
+		all_units.append(unit_instance)
+		board.set_tile_data(spawn_pos, unit_instance)
+		
+		print("[GameManager] Spawned player unit: %s at %s" % [unit_data.unit_name, spawn_pos])
+		spawn_index += 1
+	
+	# ===================
+	# SPAWN ENEMY UNITS
+	# ===================
+	
+	# Determine enemy count and difficulty based on region/node
+	var enemy_count = _get_enemy_count()
+	var enemy_unit_pool = _get_enemy_unit_pool()
+	
+	# Enemy units spawn on right side (last 2 columns)
+	var enemy_spawn_positions: Array[Vector2i] = []
+	for y in range(board_height):
+		for x in range(board_width - 2, board_width): # Last 2 columns
+			enemy_spawn_positions.append(Vector2i(x, y))
+	
+	enemy_spawn_positions.shuffle()
+	
+	# Spawn enemies
+	spawn_index = 0
+	for i in range(enemy_count):
+		if spawn_index >= enemy_spawn_positions.size():
+			break
+		
+		var spawn_pos = enemy_spawn_positions[spawn_index]
+		
+		# Make sure position is valid
+		while not _is_valid_spawn_position(spawn_pos) and spawn_index < enemy_spawn_positions.size() - 1:
+			spawn_index += 1
+			spawn_pos = enemy_spawn_positions[spawn_index]
+		
+		# Pick random enemy from pool
+		var enemy_data_path = enemy_unit_pool[randi() % enemy_unit_pool.size()]
+		var enemy_data = load(enemy_data_path) as UnitData
+		
+		if enemy_data == null:
+			push_warning("[GameManager] Could not load enemy data: %s" % enemy_data_path)
+			spawn_index += 1
+			continue
+		
+		# Create and setup enemy unit
+		var unit_instance = unit_scene.instantiate()
+		unit_instance.grid_position = spawn_pos
+		unit_instance.position = board.grid_to_world(spawn_pos)
+		unit_instance.unit_data = enemy_data
+		unit_instance.is_player_unit = false
+		
+		# Add to scene and tracking
+		add_child(unit_instance)
+		enemy_units.append(unit_instance)
+		all_units.append(unit_instance)
+		board.set_tile_data(spawn_pos, unit_instance)
+		
+		print("[GameManager] Spawned enemy unit: %s at %s" % [enemy_data.unit_name, spawn_pos])
+		spawn_index += 1
+	
+	print("[GameManager] Spawned %d player units and %d enemy units" % [player_units.size(), enemy_units.size()])
+
+
+## Checks if a grid position is valid for spawning (walkable and empty)
+func _is_valid_spawn_position(pos: Vector2i) -> bool:
+	# Check bounds
+	var board_width = board.board_width if board.get("board_width") else 8
+	var board_height = board.board_height if board.get("board_height") else 8
+	
+	if pos.x < 0 or pos.x >= board_width or pos.y < 0 or pos.y >= board_height:
+		return false
+	
+	# Check if tile is walkable (not a wall/obstacle)
+	if board.has_method("is_tile_walkable"):
+		if not board.is_tile_walkable(pos):
+			return false
+	
+	# Check if tile is empty (no unit there)
+	if board.has_method("get_tile_data"):
+		var tile_data = board.get_tile_data(pos)
+		if tile_data != null:
+			return false
+	
+	return true
+
+
+## Returns the number of enemies to spawn based on current region and node
+func _get_enemy_count() -> int:
+	var base_count = 4
+	var region_bonus = RunManager.current_region * 2 # More enemies in later regions
+	var node_bonus = RunManager.current_node # Slightly more as you progress
+	
+	# Add some randomness
+	var count = base_count + region_bonus + (node_bonus / 2) + randi_range(-1, 1)
+	
+	# Clamp to reasonable range
+	return clamp(count, 3, 10)
+
+
+## Returns the enemy unit pool based on current region
+func _get_enemy_unit_pool() -> Array[String]:
+	var region = RunManager.current_region
+	
+	# Different enemies for different regions
+	match region:
+		0: # Borderlands - basic barbarians
+			return [
+				"res://resources/unit_data/barbarian_pawn.tres",
+				"res://resources/unit_data/barbarian_pawn.tres", # More common
+				"res://resources/unit_data/barbarian_hunter.tres",
+			]
+		1: # Northern Holds - stronger mix
+			return [
+				"res://resources/unit_data/barbarian_pawn.tres",
+				"res://resources/unit_data/barbarian_hunter.tres",
+				"res://resources/unit_data/barbarian_berserker.tres",
+			]
+		2: # Southern Wastes - toughest enemies
+			return [
+				"res://resources/unit_data/barbarian_hunter.tres",
+				"res://resources/unit_data/barbarian_berserker.tres",
+				"res://resources/unit_data/barbarian_berserker.tres",
+			]
+		_:
+			return [
+				"res://resources/unit_data/barbarian_pawn.tres",
+			]
 
 ## Loads a UnitData resource from the given path
 ## @param path: Full resource path to the .tres file
@@ -366,6 +556,14 @@ func handle_tile_click_moving(grid_pos: Vector2i) -> void:
 ## Either attacks the target enemy or deselects
 ## @param grid_pos: Grid coordinates of clicked tile
 func handle_tile_click_attacking(grid_pos: Vector2i) -> void:
+		# Safety check - selected unit may have been destroyed
+	if selected_unit == null or not is_instance_valid(selected_unit):
+		print("[GameManager] No valid unit selected, returning to SELECTING state")
+		current_state = GameState.SELECTING
+		deselect_unit()
+		return
+	
+
 	# Check if there's an enemy at this position within attack range
 	if grid_pos in valid_attack_positions:
 		var target = board.get_tile_data(grid_pos)
@@ -576,22 +774,36 @@ func check_attack_options(unit) -> void:
 ## @param attacker: The attacking unit
 ## @param defender: The defending unit
 func attack_unit(attacker, defender) -> void:
+	# Safety checks - units may be null or deleted
+	if attacker == null or defender == null:
+		print("[GameManager] Attack cancelled - unit is null")
+		deselect_unit()
+		return
+	
+	if not is_instance_valid(attacker) or not is_instance_valid(defender):
+		print("[GameManager] Attack cancelled - unit instance invalid")
+		deselect_unit()
+		return
+	
 	print("[GameManager] === ATTACKING ===")
 	print("[GameManager] Attacker: ", attacker.grid_position, " -> Defender: ", defender.grid_position)
+	
+	# Store defender position before combat (in case defender dies)
+	var defender_position = defender.position
 	
 	# Use CombatManager singleton to resolve combat
 	# Result is handled via combat_resolved signal callback
 	var result: Dictionary = CombatManager.resolve_combat(attacker, defender)
 	
-	# Show floating damage number
-	show_damage_number(defender.position, result.damage_dealt, result.is_crit)
+	# Show floating damage number at stored position
+	show_damage_number(defender_position, result.damage_dealt, result.is_crit)
 	
-	# Mark attacker as having attacked this turn
-	attacker.has_attacked = true
+	# Check if attacker still exists before marking as attacked
+	if is_instance_valid(attacker) and not attacker.is_queued_for_deletion():
+		attacker.has_attacked = true
 	
 	# Clear highlights and deselect
 	deselect_unit()
-
 
 ## Shows a floating damage number at the specified position
 ## @param pos: World position to spawn the number
@@ -622,6 +834,9 @@ func show_damage_number(pos: Vector2, damage: int, is_crit: bool) -> void:
 ## Called when a unit dies (HP reaches 0)
 ## Removes unit from all tracking arrays and board
 ## @param unit: The unit that died
+## Called when a unit dies (HP reaches 0)
+## Removes unit from all tracking arrays and board
+## @param unit: The unit that died
 func _on_unit_died(unit) -> void:
 	print("[GameManager] Unit died at: ", unit.grid_position)
 	
@@ -632,6 +847,12 @@ func _on_unit_died(unit) -> void:
 	player_units.erase(unit)
 	enemy_units.erase(unit)
 	all_units.erase(unit)
+	
+	# If this is a player unit in a roguelike run, mark as wounded instead of dead
+	if unit.is_player_unit and RunManager.run_active:
+		if unit.unit_data:
+			RunManager.wound_unit(unit.unit_data, 2)
+			print("[GameManager] Player unit wounded: %s" % unit.unit_data.unit_name)
 	
 	# Remove from scene tree (deferred to avoid issues during iteration)
 	unit.queue_free()
@@ -645,28 +866,50 @@ func _on_unit_died(unit) -> void:
 
 ## Checks if the game has ended (all units of one side dead)
 
+## Checks if the game has ended (all units of one side dead)
 func check_game_over():
 	if player_units.size() == 0:
-		print("GAME OVER - You Lost!")
+		print("[GameManager] GAME OVER - You Lost!")
 		current_state = GameState.GAME_OVER
-		show_game_over_popup("DEFEAT", "All your units were destroyed!")
+		
+		# Check if this is a roguelike run
+		if RunManager.run_active:
+			# End the run in defeat
+			RunManager.end_run(false)
+			# Small delay then go to defeat screen
+			await get_tree().create_timer(1.5).timeout
+			get_tree().change_scene_to_file("res://scenes/game_over/defeat_screen.tscn")
+		else:
+			# Standalone battle - show popup
+			show_game_over_popup("DEFEAT", "All your units were destroyed!")
+			
 	elif enemy_units.size() == 0:
-		print("VICTORY - You Won!")
+		print("[GameManager] VICTORY - You Won!")
 		current_state = GameState.GAME_OVER
 		
-		# Generate item drops as rewards!
-		var items_dropped: Array = []
-		for i in range(3): # Drop 3 random items
-			var item = ItemManager.generate_random_item_drop()
-			if item:
-				items_dropped.append(item)
+		# Track enemies defeated for RunManager
+		var enemies_defeated = 5 # We can make this more accurate later
+		RunManager.enemies_defeated += enemies_defeated
 		
-		# Build victory message with item list
-		var message: String = "You defeated all enemies!\n\nItems dropped:\n"
-		for item in items_dropped:
-			message += "• " + item.item_name + " (" + item.rarity + ")\n"
-		
-		show_game_over_popup("VICTORY", message)
+		# Check if this is a roguelike run
+		if RunManager.run_active:
+			# Small delay to let player see victory
+			await get_tree().create_timer(1.5).timeout
+			# Go to reward screen
+			get_tree().change_scene_to_file("res://scenes/rewards/reward_screen.tscn")
+		else:
+			# Standalone battle - show popup with items
+			var items_dropped: Array = []
+			for i in range(3):
+				var item = ItemManager.generate_random_item_drop()
+				if item:
+					items_dropped.append(item)
+			
+			var message: String = "You defeated all enemies!\n\nItems dropped:\n"
+			for item in items_dropped:
+				message += "• " + item.item_name + " (" + item.rarity + ")\n"
+			
+			show_game_over_popup("VICTORY", message)
 
 func show_game_over_popup(title: String, message: String):
 	# Create a simple popup
@@ -692,9 +935,15 @@ func show_game_over_popup(title: String, message: String):
 	print("Game Over popup shown: ", title)
 
 func _on_game_over_confirmed():
-	print("Restarting game...")
-	# Reload the scene
-	get_tree().reload_current_scene()
+	print("[GameManager] Game over confirmed, handling restart...")
+	
+	# Check if this is a roguelike run
+	if RunManager.run_active:
+		# Go back to world map
+		get_tree().change_scene_to_file("res://scenes/maps/world_map.tscn")
+	else:
+		# Standalone - reload current scene
+		get_tree().reload_current_scene()
 
 # ============================================================================
 # TURN MANAGEMENT CALLBACKS
