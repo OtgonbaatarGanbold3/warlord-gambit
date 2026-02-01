@@ -904,6 +904,11 @@ func check_game_over():
 			
 	elif enemy_units.size() == 0:
 		print("[GameManager] VICTORY - You Won!")
+		print("[GameManager] === VICTORY DEBUG INFO ===")
+		print("[GameManager]   run_active: ", RunManager.run_active)
+		print("[GameManager]   is_boss_battle: ", RunManager.is_boss_battle)
+		print("[GameManager]   current_region: ", RunManager.current_region)
+		print("[GameManager]   regions_unlocked: ", RunManager.regions_unlocked)
 		current_state = GameState.GAME_OVER
 		
 		# Track enemies defeated for RunManager
@@ -918,9 +923,14 @@ func check_game_over():
 			# Check if this was a boss battle
 			if RunManager.is_boss_battle:
 				print("[GameManager] BOSS DEFEATED! Region complete!")
+				print("[GameManager]   Calling RunManager.complete_region(%d)" % RunManager.current_region)
 				
 				# Complete the region
 				RunManager.complete_region(RunManager.current_region)
+				
+				print("[GameManager]   AFTER complete_region:")
+				print("[GameManager]   regions_unlocked: ", RunManager.regions_unlocked)
+				
 				RunManager.is_boss_battle = false
 				
 				# Check if ALL regions are complete (beat region index 2 = third region)
@@ -929,6 +939,7 @@ func check_game_over():
 					get_tree().change_scene_to_file("res://scenes/game_over/victory_screen.tscn")
 					return
 			
+			print("[GameManager] Going to reward screen...")
 			# Go to reward screen (for both boss and regular battles)
 			get_tree().change_scene_to_file("res://scenes/rewards/reward_screen.tscn")
 		else:
@@ -1181,6 +1192,21 @@ func _input(event: InputEvent) -> void:
 			print("[DEBUG] Select a player unit first to equip items")
 	
 	# TEMPORARY: Press V to simulate victory (for testing)
+	# This now follows the normal victory flow instead of skipping to reward screen
 	if event is InputEventKey and event.pressed and event.keycode == KEY_V:
-		print("[GameManager] DEBUG: Simulating victory!")
-		get_tree().change_scene_to_file("res://scenes/rewards/reward_screen.tscn")
+		print("=== DEBUG V KEY - Simulating Victory ===")
+		print("[DEBUG] is_boss_battle: ", RunManager.is_boss_battle)
+		print("[DEBUG] current_region: ", RunManager.current_region)
+		print("[DEBUG] regions_unlocked BEFORE: ", RunManager.regions_unlocked)
+		
+		# Kill all enemy units to trigger normal victory flow
+		print("[GameManager] DEBUG: Killing all enemies to simulate victory...")
+		var enemies_to_remove = enemy_units.duplicate()
+		for enemy in enemies_to_remove:
+			if is_instance_valid(enemy):
+				enemy_units.erase(enemy)
+				all_units.erase(enemy)
+				enemy.queue_free()
+		
+		# Now check_game_over() will detect victory and follow the proper flow
+		check_game_over()

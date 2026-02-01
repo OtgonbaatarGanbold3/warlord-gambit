@@ -35,6 +35,8 @@ var available_units: Array[UnitData] = []
 
 func _ready() -> void:
 	print("[Deployment] Screen loaded")
+	print("[Deployment] is_boss_battle: %s" % str(RunManager.is_boss_battle))
+	print("[Deployment] current_region: %d, current_node: %d" % [RunManager.current_region, RunManager.current_node])
 	
 	# Connect button signals
 	back_button.pressed.connect(_on_back_pressed)
@@ -277,6 +279,7 @@ func _on_start_battle_pressed() -> void:
 	RunManager.set_active_squad(typed_squad)
 	
 	print("[Deployment] Starting battle with %d units!" % selected_squad.size())
+	print("[Deployment] is_boss_battle going into battle: %s" % str(RunManager.is_boss_battle))
 	
 	# Go to battle scene
 	# TODO: Change this to your actual battle scene path

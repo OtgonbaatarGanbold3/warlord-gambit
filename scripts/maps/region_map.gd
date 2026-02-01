@@ -65,6 +65,7 @@ func _setup_region_map() -> void:
 	var nodes = REGION_NODES.get(region, REGION_NODES[0])
 	
 	print("[RegionMap] Setting up %d nodes for region %d" % [nodes.size(), region])
+	print("[RegionMap] Available buttons: %d" % node_buttons.size())
 	
 	# First, hide all existing node buttons
 	for button in node_buttons:
@@ -84,8 +85,15 @@ func _setup_region_map() -> void:
 				button.pressed.disconnect(_on_node_pressed)
 			button.pressed.connect(_on_node_pressed.bind(i))
 		else:
-			# Need more buttons than we have - create dynamically (future improvement)
-			push_warning("[RegionMap] Not enough node buttons! Need %d, have %d" % [nodes.size(), node_buttons.size()])
+			# Dynamically create missing buttons
+			print("[RegionMap] Creating dynamic button for node %d (%s)" % [i, nodes[i]])
+			var new_button = Button.new()
+			new_button.custom_minimum_size = Vector2(80, 60)
+			new_button.text = "%s\n%s" % [NODE_ICONS.get(nodes[i], "?"), nodes[i]]
+			new_button.visible = true
+			new_button.pressed.connect(_on_node_pressed.bind(i))
+			node_container.add_child(new_button)
+			node_buttons.append(new_button)
 
 
 ## Updates UI elements based on RunManager state
@@ -175,10 +183,15 @@ func _open_shop() -> void:
 	get_tree().change_scene_to_file("res://scenes/shop/shop_screen.tscn")
 
 func _start_boss_battle() -> void:
-	print("[RegionMap] Starting BOSS battle!")
+	print("[RegionMap] ===== STARTING BOSS BATTLE =====")
+	print("[RegionMap] Setting RunManager.is_boss_battle = true")
+	print("[RegionMap] current_region: %d" % RunManager.current_region)
+	print("[RegionMap] regions_unlocked: %d" % RunManager.regions_unlocked)
 	
 	# Mark this as a boss battle in RunManager
 	RunManager.is_boss_battle = true
+	
+	print("[RegionMap] is_boss_battle is now: %s" % str(RunManager.is_boss_battle))
 	
 	# Go to deployment screen (which leads to battle)
 	get_tree().change_scene_to_file("res://scenes/deployment/deployment_screen.tscn")

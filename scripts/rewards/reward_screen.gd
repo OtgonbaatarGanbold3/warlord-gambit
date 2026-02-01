@@ -217,6 +217,13 @@ func _on_gold_selected() -> void:
 
 ## Called after any reward is selected
 func _finish_reward() -> void:
+	print("[RewardScreen] ===== _finish_reward CALLED =====")
+	print("[RewardScreen] BEFORE changes:")
+	print("[RewardScreen]   is_boss_battle: %s" % str(RunManager.is_boss_battle))
+	print("[RewardScreen]   current_region: %d" % RunManager.current_region)
+	print("[RewardScreen]   current_node: %d" % RunManager.current_node)
+	print("[RewardScreen]   regions_unlocked: %d" % RunManager.regions_unlocked)
+	
 	# Mark current node as complete
 	RunManager.complete_current_node()
 	
@@ -253,8 +260,21 @@ func _finish_reward() -> void:
 	}
 	var max_nodes = region_node_counts.get(RunManager.current_region, 5)
 	
+	print("[RewardScreen] Checking if region complete: current_node=%d, max_nodes=%d" % [RunManager.current_node, max_nodes])
+	
 	if RunManager.current_node >= max_nodes:
 		print("[RewardScreen] Region %d complete! Going to world map..." % RunManager.current_region)
+		print("[RewardScreen] regions_unlocked at this point: %d" % RunManager.regions_unlocked)
+		
+		# SAFEGUARD: Ensure complete_region was called (in case is_boss_battle wasn't set)
+		# The expected value after completing region N should be N+2 (for regions 0,1) or 3 (for region 2)
+		var expected_unlock = min(RunManager.current_region + 2, 3)
+		if RunManager.regions_unlocked < expected_unlock:
+			print("[RewardScreen] WARNING: regions_unlocked (%d) is less than expected (%d)!" % [RunManager.regions_unlocked, expected_unlock])
+			print("[RewardScreen] Calling complete_region(%d) as safeguard..." % RunManager.current_region)
+			RunManager.complete_region(RunManager.current_region)
+			print("[RewardScreen] regions_unlocked after safeguard: %d" % RunManager.regions_unlocked)
+		
 		# Advance to next region
 		RunManager.current_region += 1
 		RunManager.current_node = 0
@@ -262,4 +282,5 @@ func _finish_reward() -> void:
 		get_tree().change_scene_to_file("res://scenes/maps/world_map.tscn")
 	else:
 		# Return to region map
+		print("[RewardScreen] Returning to region map...")
 		get_tree().change_scene_to_file("res://scenes/maps/region_map.tscn")

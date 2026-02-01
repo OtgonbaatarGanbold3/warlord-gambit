@@ -119,9 +119,12 @@ func start_new_run(faction: String, formation: String) -> void:
 	current_region = 0
 	current_node = 0
 	completed_nodes = []
+	regions_unlocked = 1
+	is_boss_battle = false
 	gold = 100 # Starting gold
 	selected_faction = faction
 	selected_formation = formation
+
 
 	# Reset army
 	army_roster = []
@@ -375,15 +378,21 @@ func get_save_data() -> Dictionary:
 
 ## Called when a boss is defeated and region is complete
 func complete_region(region_index: int) -> void:
+	print("[RunManager] ===== COMPLETE_REGION CALLED =====")
 	print("[RunManager] Region %d COMPLETE!" % region_index)
+	print("[RunManager] regions_unlocked BEFORE: %d" % regions_unlocked)
 	
 	# Unlock next region
 	if region_index + 1 < 3:
 		regions_unlocked = max(regions_unlocked, region_index + 2)
+		print("[RunManager] Setting regions_unlocked to: %d" % regions_unlocked)
 		print("[RunManager] Unlocked region %d" % (region_index + 1))
 	else:
 		# All regions complete!
 		regions_unlocked = 3
+		print("[RunManager] All regions complete! regions_unlocked = 3")
+	
+	print("[RunManager] regions_unlocked AFTER: %d" % regions_unlocked)
 	
 	# Bonus rewards for beating a boss
 	var boss_gold_bonus = 100 + (region_index * 50)
@@ -400,6 +409,8 @@ func complete_region(region_index: int) -> void:
 	
 	if healed > 0:
 		print("[RunManager] %d wounded units recovered!" % healed)
+	
+	print("[RunManager] ===== COMPLETE_REGION DONE =====")
 		
 ## Loads run state from a save dictionary
 func load_save_data(data: Dictionary) -> void:
