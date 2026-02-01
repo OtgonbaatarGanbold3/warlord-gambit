@@ -885,6 +885,7 @@ func _on_unit_died(unit) -> void:
 ## Checks if the game has ended (all units of one side dead)
 
 ## Checks if the game has ended (all units of one side dead)
+## Checks if the game has ended (all units of one side dead)
 func check_game_over():
 	if player_units.size() == 0:
 		print("[GameManager] GAME OVER - You Lost!")
@@ -906,8 +907,8 @@ func check_game_over():
 		current_state = GameState.GAME_OVER
 		
 		# Track enemies defeated for RunManager
-		var enemies_defeated = 5 # We can make this more accurate later
-		RunManager.enemies_defeated += enemies_defeated
+		var enemies_defeated_count = 5 # We can make this more accurate later
+		RunManager.enemies_defeated += enemies_defeated_count
 		
 		# Check if this is a roguelike run
 		if RunManager.run_active:
@@ -917,24 +918,19 @@ func check_game_over():
 			# Check if this was a boss battle
 			if RunManager.is_boss_battle:
 				print("[GameManager] BOSS DEFEATED! Region complete!")
+				
+				# Complete the region
+				RunManager.complete_region(RunManager.current_region)
 				RunManager.is_boss_battle = false
 				
-				# Mark region as complete and unlock next
-				RunManager.complete_region(RunManager.current_region)
-				
-				# Check if all regions are complete
-				if RunManager.current_region >= 2: # Was the final region
-					# Check if all 3 regions are unlocked (meaning all beaten)
-					if RunManager.regions_unlocked >= 3:
-						print("[GameManager] ALL REGIONS COMPLETE! YOU WIN!")
-						get_tree().change_scene_to_file("res://scenes/game_over/victory_screen.tscn")
-						return
-				
-				# Go to reward screen, then back to world map
-				get_tree().change_scene_to_file("res://scenes/rewards/reward_screen.tscn")
-			else:
-				# Regular battle - go to reward screen
-				get_tree().change_scene_to_file("res://scenes/rewards/reward_screen.tscn")
+				# Check if ALL regions are complete (beat region index 2 = third region)
+				if RunManager.current_region >= 2 and RunManager.regions_unlocked >= 3:
+					print("[GameManager] ALL REGIONS COMPLETE! YOU WIN!")
+					get_tree().change_scene_to_file("res://scenes/game_over/victory_screen.tscn")
+					return
+			
+			# Go to reward screen (for both boss and regular battles)
+			get_tree().change_scene_to_file("res://scenes/rewards/reward_screen.tscn")
 		else:
 			# Standalone battle - show popup with items
 			var items_dropped: Array = []
@@ -948,7 +944,7 @@ func check_game_over():
 				message += "• " + item.item_name + " (" + item.rarity + ")\n"
 			
 			show_game_over_popup("VICTORY", message)
-			
+					
 func show_game_over_popup(title: String, message: String):
 	# Create a simple popup
 	var popup = AcceptDialog.new()

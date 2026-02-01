@@ -44,6 +44,12 @@ var current_node: int = 0
 ## Which nodes have been completed in current region
 var completed_nodes: Array[int] = []
 
+## Whether the current battle is a boss battle
+var is_boss_battle: bool = false
+
+## How many regions have been unlocked/beaten
+var regions_unlocked: int = 1
+
 ## Player's gold
 var gold: int = 0
 
@@ -74,12 +80,6 @@ const MAX_SQUAD_SIZE: int = 8
 
 ## Starting army size
 const STARTING_ARMY_SIZE: int = 5
-
-## Whether the current battle is a boss battle
-var is_boss_battle: bool = false
-
-## How many regions are unlocked (starts at 1)
-var regions_unlocked: int = 1
 
 # =============================================================================
 # INVENTORY
@@ -123,9 +123,6 @@ func start_new_run(faction: String, formation: String) -> void:
 	selected_faction = faction
 	selected_formation = formation
 
-	is_boss_battle = false
-	regions_unlocked = 1
-	
 	# Reset army
 	army_roster = []
 	active_squad = []
@@ -384,6 +381,9 @@ func complete_region(region_index: int) -> void:
 	if region_index + 1 < 3:
 		regions_unlocked = max(regions_unlocked, region_index + 2)
 		print("[RunManager] Unlocked region %d" % (region_index + 1))
+	else:
+		# All regions complete!
+		regions_unlocked = 3
 	
 	# Bonus rewards for beating a boss
 	var boss_gold_bonus = 100 + (region_index * 50)
@@ -400,7 +400,7 @@ func complete_region(region_index: int) -> void:
 	
 	if healed > 0:
 		print("[RunManager] %d wounded units recovered!" % healed)
-
+		
 ## Loads run state from a save dictionary
 func load_save_data(data: Dictionary) -> void:
 	run_active = data.get("run_active", false)

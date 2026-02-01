@@ -43,38 +43,41 @@ func _ready() -> void:
 	# Update UI based on RunManager state
 	_update_ui()
 
+
 ## Updates all UI elements based on current run state
 func _update_ui() -> void:
 	# Update gold and army count
 	gold_label.text = "Gold: %d" % RunManager.gold
 	army_label.text = "Army: %d units" % RunManager.army_roster.size()
 	
-	# Update region buttons based on progression
-	var current_region = RunManager.current_region
+	# Update region buttons based on regions_unlocked (not current_region)
+	var unlocked = RunManager.regions_unlocked
+	
+	print("[WorldMap] Regions unlocked: %d, Current region: %d" % [unlocked, RunManager.current_region])
 	
 	# Region 1 - Always unlocked
 	region1_button.disabled = false
-	_update_region_button(region1_button, 0, current_region)
+	_update_region_button(region1_button, 0, unlocked)
 	
 	# Region 2 - Unlocked after completing region 1
-	region2_button.disabled = current_region < 1
-	_update_region_button(region2_button, 1, current_region)
+	region2_button.disabled = unlocked < 2
+	_update_region_button(region2_button, 1, unlocked)
 	
 	# Region 3 - Unlocked after completing region 2
-	region3_button.disabled = current_region < 2
-	_update_region_button(region3_button, 2, current_region)
+	region3_button.disabled = unlocked < 3
+	_update_region_button(region3_button, 2, unlocked)
 
 
 ## Updates a single region button's appearance
-func _update_region_button(button: Button, region_index: int, current_region: int) -> void:
+func _update_region_button(button: Button, region_index: int, regions_unlocked: int) -> void:
 	var region_name = REGION_NAMES[region_index]
 	var difficulty = REGION_DIFFICULTY[region_index]
 	
-	if region_index < current_region:
+	if region_index < regions_unlocked - 1 or (region_index < RunManager.current_region):
 		# Completed region
 		button.text = "%s\n(%s)\n✅ CONQUERED" % [region_name, difficulty]
-	elif region_index == current_region:
-		# Current region (playable)
+	elif region_index < regions_unlocked:
+		# Unlocked region (playable)
 		button.text = "%s\n(%s)\n▶ ENTER" % [region_name, difficulty]
 	else:
 		# Locked region
@@ -100,10 +103,9 @@ func _on_region3_pressed() -> void:
 
 
 ## Enters the selected region and switches to the region map scene
-## Enters the selected region and switches to the region map scene
 func _enter_region(region_index: int) -> void:
 	# Verify player can enter this region
-	if region_index > RunManager.current_region:
+	if region_index >= RunManager.regions_unlocked:
 		print("[WorldMap] Cannot enter locked region!")
 		return
 	
@@ -116,16 +118,3 @@ func _enter_region(region_index: int) -> void:
 	
 	# Switch to Region Map scene
 	get_tree().change_scene_to_file("res://scenes/maps/region_map.tscn")
-	# Update RunManager
-	RunManager.current_region = region_index
-	RunManager.current_node = 0
-	RunManager.completed_nodes = []
-	
-	print("[WorldMap] Entering region %d..." % region_index)
-	
-	# Switch to Region Map scene (we'll create this next!)
-	# For now, just print - we'll uncomment this later
-	# get_tree().change_scene_to_file("res://scenes/maps/region_map.tscn")
-	
-	# TEMPORARY: For testing, let's go directly to battle
-	print("[WorldMap] (Region Map not yet created - would transition here)")

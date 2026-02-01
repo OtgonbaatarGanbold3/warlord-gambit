@@ -226,16 +226,39 @@ func _finish_reward() -> void:
 	# Process wound recovery
 	RunManager.on_battle_won()
 	
-	print("[RewardScreen] Reward collected! Returning to map...")
+	print("[RewardScreen] Reward collected!")
 	print("[RewardScreen] Army size: %d, Gold: %d" % [
 		RunManager.army_roster.size(),
 		RunManager.gold
 	])
+	print("[RewardScreen] Current region: %d, Current node: %d, Regions unlocked: %d" % [
+		RunManager.current_region,
+		RunManager.current_node,
+		RunManager.regions_unlocked
+	])
 	
-	# Check if we just beat a boss (region complete)
-	# If so, go to world map to select next region
-	if RunManager.current_node > 6: # Past the boss node
-		print("[RewardScreen] Region complete! Returning to world map...")
+	# Check if we just beat the final boss (all regions complete)
+	if RunManager.current_region >= 2 and RunManager.regions_unlocked >= 3:
+		# Check if we've passed the last node of region 3
+		if RunManager.current_node >= 8: # Region 3 has 8 nodes (0-7)
+			print("[RewardScreen] Game complete! Going to victory screen...")
+			get_tree().change_scene_to_file("res://scenes/game_over/victory_screen.tscn")
+			return
+	
+	# Check if we just beat a boss (current node is past the last node of region)
+	var region_node_counts = {
+		0: 5, # Borderlands has 5 nodes (indices 0-4)
+		1: 7, # Northern Holds has 7 nodes (indices 0-6)
+		2: 8 # Southern Wastes has 8 nodes (indices 0-7)
+	}
+	var max_nodes = region_node_counts.get(RunManager.current_region, 5)
+	
+	if RunManager.current_node >= max_nodes:
+		print("[RewardScreen] Region %d complete! Going to world map..." % RunManager.current_region)
+		# Advance to next region
+		RunManager.current_region += 1
+		RunManager.current_node = 0
+		RunManager.completed_nodes = []
 		get_tree().change_scene_to_file("res://scenes/maps/world_map.tscn")
 	else:
 		# Return to region map
