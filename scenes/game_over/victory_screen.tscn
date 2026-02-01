@@ -1,0 +1,86 @@
+[gd_scene format=3 uid="uid://cep454s1tli75"]
+
+[ext_resource type="Script" uid="uid://4e8kjf5evbuf" path="res://scripts/game_over/victory_screen.gd" id="1_chde7"]
+
+[node name="VictoryScreen" type="Control" unique_id=263510741]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_chde7")
+
+[node name="ColorRect" type="ColorRect" parent="." unique_id=879491998]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.16470589, 0.16470589, 0.0627451, 1)
+
+[node name="TitleLabel" type="Label" parent="." unique_id=1069583596]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -59.5
+offset_top = -144.5
+offset_right = 59.5
+offset_bottom = -95.5
+grow_horizontal = 2
+grow_vertical = 2
+text = " 🏆 VICTORY! 🏆
+"
+horizontal_alignment = 1
+
+[node name="StatsLabel" type="Label" parent="." unique_id=411815978]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -207.5
+offset_top = -11.5
+offset_right = 207.5
+offset_bottom = 11.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Battles Won: 0 | Enemies Defeated: 0 | Gold Earned: 0"
+horizontal_alignment = 1
+
+[node name="ArmyLabel" type="Label" parent="." unique_id=997215270]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -207.5
+offset_top = 28.5
+offset_right = 207.5
+offset_bottom = 51.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "Army Survived: 0 units"
+horizontal_alignment = 1
+
+[node name="PlayAgainButton" type="Button" parent="." unique_id=588167113]
+custom_minimum_size = Vector2(200, 0)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -100.0
+offset_top = 84.5
+offset_right = 100.0
+offset_bottom = 115.5
+grow_horizontal = 2
+grow_vertical = 2
+text = "PLAY AGAIN"

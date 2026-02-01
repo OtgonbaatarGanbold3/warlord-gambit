@@ -75,6 +75,12 @@ const MAX_SQUAD_SIZE: int = 8
 ## Starting army size
 const STARTING_ARMY_SIZE: int = 5
 
+## Whether the current battle is a boss battle
+var is_boss_battle: bool = false
+
+## How many regions are unlocked (starts at 1)
+var regions_unlocked: int = 1
+
 # =============================================================================
 # INVENTORY
 # =============================================================================
@@ -116,6 +122,9 @@ func start_new_run(faction: String, formation: String) -> void:
 	gold = 100 # Starting gold
 	selected_faction = faction
 	selected_formation = formation
+
+	is_boss_battle = false
+	regions_unlocked = 1
 	
 	# Reset army
 	army_roster = []
@@ -366,6 +375,31 @@ func get_save_data() -> Dictionary:
 		# Note: Unit data paths would need to be stored separately
 	}
 
+
+## Called when a boss is defeated and region is complete
+func complete_region(region_index: int) -> void:
+	print("[RunManager] Region %d COMPLETE!" % region_index)
+	
+	# Unlock next region
+	if region_index + 1 < 3:
+		regions_unlocked = max(regions_unlocked, region_index + 2)
+		print("[RunManager] Unlocked region %d" % (region_index + 1))
+	
+	# Bonus rewards for beating a boss
+	var boss_gold_bonus = 100 + (region_index * 50)
+	add_gold(boss_gold_bonus)
+	print("[RunManager] Boss bonus: +%d gold!" % boss_gold_bonus)
+	
+	# Heal some wounded units as celebration
+	var healed = 0
+	var to_heal = wounded_units.duplicate()
+	for unit in to_heal:
+		if randf() < 0.5: # 50% chance to heal each wounded
+			heal_unit(unit)
+			healed += 1
+	
+	if healed > 0:
+		print("[RunManager] %d wounded units recovered!" % healed)
 
 ## Loads run state from a save dictionary
 func load_save_data(data: Dictionary) -> void:

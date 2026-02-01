@@ -177,13 +177,8 @@ func _open_shop() -> void:
 func _start_boss_battle() -> void:
 	print("[RegionMap] Starting BOSS battle!")
 	
-	# TEMPORARY: Auto-complete and advance region
-	var node_index = RunManager.current_node
-	RunManager.completed_nodes.append(node_index)
-	RunManager.on_battle_won()
-	RunManager.advance_to_next_region()
+	# Mark this as a boss battle in RunManager
+	RunManager.is_boss_battle = true
 	
-	print("[RegionMap] (Boss defeated! Advancing to next region...)")
-	
-	# Go back to world map to select next region
-	get_tree().change_scene_to_file("res://scenes/maps/world_map.tscn")
+	# Go to deployment screen (which leads to battle)
+	get_tree().change_scene_to_file("res://scenes/deployment/deployment_screen.tscn")

@@ -194,19 +194,18 @@ func spawn_deployed_units() -> void:
 		push_error("[GameManager] ERROR: Could not load unit scene!")
 		return
 	
-	# Get board dimensions
-	var board_width = board.board_width if board.get("board_width") else 8
-	var board_height = board.board_height if board.get("board_height") else 8
+	# Get board size (use BOARD_SIZE constant via the board)
+	var board_size = board.BOARD_SIZE # Should be 10
 	
 	# ===================
 	# SPAWN PLAYER UNITS
 	# ===================
 	
-	# Player units spawn on left side (columns 0-1)
+	# Player units spawn on bottom side (rows 7-9, like spawn_test_units)
 	var player_spawn_positions: Array[Vector2i] = []
-	for y in range(board_height):
-		for x in range(2): # First 2 columns
-			player_spawn_positions.append(Vector2i(x, y))
+	for row in range(board_size - 3, board_size): # Rows 7, 8, 9
+		for col in range(board_size): # All columns
+			player_spawn_positions.append(Vector2i(col, row))
 	
 	# Shuffle spawn positions for variety
 	player_spawn_positions.shuffle()
@@ -225,20 +224,14 @@ func spawn_deployed_units() -> void:
 			spawn_index += 1
 			spawn_pos = player_spawn_positions[spawn_index]
 		
-		# Create and setup unit
-		var unit_instance = unit_scene.instantiate()
-		unit_instance.grid_position = spawn_pos
-		unit_instance.position = board.grid_to_world(spawn_pos)
-		unit_instance.unit_data = unit_data
-		unit_instance.is_player_unit = true
+		# Use existing _spawn_unit function for consistency
+		var unit = _spawn_unit(unit_scene, unit_data, spawn_pos, true)
 		
-		# Add to scene and tracking
-		add_child(unit_instance)
-		player_units.append(unit_instance)
-		all_units.append(unit_instance)
-		board.set_tile_data(spawn_pos, unit_instance)
+		if unit:
+			player_units.append(unit)
+			all_units.append(unit)
+			print("[GameManager] Spawned player unit: %s at %s" % [unit_data.unit_name, spawn_pos])
 		
-		print("[GameManager] Spawned player unit: %s at %s" % [unit_data.unit_name, spawn_pos])
 		spawn_index += 1
 	
 	# ===================
@@ -249,11 +242,11 @@ func spawn_deployed_units() -> void:
 	var enemy_count = _get_enemy_count()
 	var enemy_unit_pool = _get_enemy_unit_pool()
 	
-	# Enemy units spawn on right side (last 2 columns)
+	# Enemy units spawn on top side (rows 0-2, like spawn_test_units)
 	var enemy_spawn_positions: Array[Vector2i] = []
-	for y in range(board_height):
-		for x in range(board_width - 2, board_width): # Last 2 columns
-			enemy_spawn_positions.append(Vector2i(x, y))
+	for row in range(3): # Rows 0, 1, 2
+		for col in range(board_size): # All columns
+			enemy_spawn_positions.append(Vector2i(col, row))
 	
 	enemy_spawn_positions.shuffle()
 	
@@ -279,47 +272,42 @@ func spawn_deployed_units() -> void:
 			spawn_index += 1
 			continue
 		
-		# Create and setup enemy unit
-		var unit_instance = unit_scene.instantiate()
-		unit_instance.grid_position = spawn_pos
-		unit_instance.position = board.grid_to_world(spawn_pos)
-		unit_instance.unit_data = enemy_data
-		unit_instance.is_player_unit = false
+		# Use existing _spawn_unit function for consistency
+		var unit = _spawn_unit(unit_scene, enemy_data, spawn_pos, false)
 		
-		# Add to scene and tracking
-		add_child(unit_instance)
-		enemy_units.append(unit_instance)
-		all_units.append(unit_instance)
-		board.set_tile_data(spawn_pos, unit_instance)
+		if unit:
+			enemy_units.append(unit)
+			all_units.append(unit)
+			print("[GameManager] Spawned enemy unit: %s at %s" % [enemy_data.unit_name, spawn_pos])
 		
-		print("[GameManager] Spawned enemy unit: %s at %s" % [enemy_data.unit_name, spawn_pos])
 		spawn_index += 1
 	
-	print("[GameManager] Spawned %d player units and %d enemy units" % [player_units.size(), enemy_units.size()])
-
+	# Print army composition
+	_print_army_composition()
 
 ## Checks if a grid position is valid for spawning (walkable and empty)
 func _is_valid_spawn_position(pos: Vector2i) -> bool:
-	# Check bounds
-	var board_width = board.board_width if board.get("board_width") else 8
-	var board_height = board.board_height if board.get("board_height") else 8
+	# Check bounds using board's BOARD_SIZE
+	var board_size = board.BOARD_SIZE
 	
-	if pos.x < 0 or pos.x >= board_width or pos.y < 0 or pos.y >= board_height:
+	if pos.x < 0 or pos.x >= board_size or pos.y < 0 or pos.y >= board_size:
 		return false
 	
-	# Check if tile is walkable (not a wall/obstacle)
-	if board.has_method("is_tile_walkable"):
-		if not board.is_tile_walkable(pos):
-			return false
+	# Check if position is valid on board
+	if not board.is_valid_position(pos):
+		return false
 	
 	# Check if tile is empty (no unit there)
-	if board.has_method("get_tile_data"):
-		var tile_data = board.get_tile_data(pos)
-		if tile_data != null:
-			return false
+	var tile_data = board.get_tile_data(pos)
+	if tile_data != null:
+		return false
+	
+	# Check terrain - avoid spawning on damaging terrain
+	var terrain = board.get_terrain(pos)
+	if terrain and terrain.damage_per_turn > 0:
+		return false
 	
 	return true
-
 
 ## Returns the number of enemies to spawn based on current region and node
 func _get_enemy_count() -> int:
@@ -327,18 +315,47 @@ func _get_enemy_count() -> int:
 	var region_bonus = RunManager.current_region * 2 # More enemies in later regions
 	var node_bonus = RunManager.current_node # Slightly more as you progress
 	
+	# Boss battles have more enemies!
+	if RunManager.is_boss_battle:
+		base_count = 6
+		region_bonus = RunManager.current_region * 3
+	
 	# Add some randomness
 	var count = base_count + region_bonus + (node_bonus / 2) + randi_range(-1, 1)
 	
 	# Clamp to reasonable range
-	return clamp(count, 3, 10)
-
+	var max_enemies = 10 if not RunManager.is_boss_battle else 12
+	return clamp(count, 3, max_enemies)
 
 ## Returns the enemy unit pool based on current region
 func _get_enemy_unit_pool() -> Array[String]:
 	var region = RunManager.current_region
 	
-	# Different enemies for different regions
+	# Boss battles include the boss unit!
+	if RunManager.is_boss_battle:
+		match region:
+			0: # Borderlands Boss
+				return [
+					"res://resources/unit_data/barbarian_berserker.tres",
+					"res://resources/unit_data/barbarian_hunter.tres",
+					"res://resources/unit_data/barbarian_warlord.tres", # BOSS
+				]
+			1: # Northern Holds Boss
+				return [
+					"res://resources/unit_data/barbarian_berserker.tres",
+					"res://resources/unit_data/barbarian_berserker.tres",
+					"res://resources/unit_data/barbarian_warlord.tres", # BOSS
+				]
+			2: # Southern Wastes Boss - Final Boss!
+				return [
+					"res://resources/unit_data/barbarian_berserker.tres",
+					"res://resources/unit_data/barbarian_warlord.tres", # BOSS
+					"res://resources/unit_data/barbarian_warlord.tres", # Double boss!
+				]
+			_:
+				return ["res://resources/unit_data/barbarian_warlord.tres"]
+	
+	# Regular battles - different enemies for different regions
 	match region:
 		0: # Borderlands - basic barbarians
 			return [
@@ -363,6 +380,7 @@ func _get_enemy_unit_pool() -> Array[String]:
 				"res://resources/unit_data/barbarian_pawn.tres",
 			]
 
+			
 ## Loads a UnitData resource from the given path
 ## @param path: Full resource path to the .tres file
 ## @return: UnitData resource or null if loading failed
@@ -895,8 +913,28 @@ func check_game_over():
 		if RunManager.run_active:
 			# Small delay to let player see victory
 			await get_tree().create_timer(1.5).timeout
-			# Go to reward screen
-			get_tree().change_scene_to_file("res://scenes/rewards/reward_screen.tscn")
+			
+			# Check if this was a boss battle
+			if RunManager.is_boss_battle:
+				print("[GameManager] BOSS DEFEATED! Region complete!")
+				RunManager.is_boss_battle = false
+				
+				# Mark region as complete and unlock next
+				RunManager.complete_region(RunManager.current_region)
+				
+				# Check if all regions are complete
+				if RunManager.current_region >= 2: # Was the final region
+					# Check if all 3 regions are unlocked (meaning all beaten)
+					if RunManager.regions_unlocked >= 3:
+						print("[GameManager] ALL REGIONS COMPLETE! YOU WIN!")
+						get_tree().change_scene_to_file("res://scenes/game_over/victory_screen.tscn")
+						return
+				
+				# Go to reward screen, then back to world map
+				get_tree().change_scene_to_file("res://scenes/rewards/reward_screen.tscn")
+			else:
+				# Regular battle - go to reward screen
+				get_tree().change_scene_to_file("res://scenes/rewards/reward_screen.tscn")
 		else:
 			# Standalone battle - show popup with items
 			var items_dropped: Array = []
@@ -910,7 +948,7 @@ func check_game_over():
 				message += "• " + item.item_name + " (" + item.rarity + ")\n"
 			
 			show_game_over_popup("VICTORY", message)
-
+			
 func show_game_over_popup(title: String, message: String):
 	# Create a simple popup
 	var popup = AcceptDialog.new()

@@ -226,11 +226,17 @@ func _finish_reward() -> void:
 	# Process wound recovery
 	RunManager.on_battle_won()
 	
-	print("[RewardScreen] Reward collected! Returning to region map...")
+	print("[RewardScreen] Reward collected! Returning to map...")
 	print("[RewardScreen] Army size: %d, Gold: %d" % [
 		RunManager.army_roster.size(),
 		RunManager.gold
 	])
 	
-	# Return to region map
-	get_tree().change_scene_to_file("res://scenes/maps/region_map.tscn")
+	# Check if we just beat a boss (region complete)
+	# If so, go to world map to select next region
+	if RunManager.current_node > 6: # Past the boss node
+		print("[RewardScreen] Region complete! Returning to world map...")
+		get_tree().change_scene_to_file("res://scenes/maps/world_map.tscn")
+	else:
+		# Return to region map
+		get_tree().change_scene_to_file("res://scenes/maps/region_map.tscn")
